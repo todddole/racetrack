@@ -19,4 +19,4 @@ def main():
 def echo_input():
     input_lat = request.form.get("lattitude", "")
     input_long = request.form.get("longitude", "")
-    return render_template('map.html') + f"<script>initMap( {escape(input_lat)}, {escape(input_long)} );</script>"
+    return render_template('map.html') + f"<script>initMap( {escape(input_lat)}, {escape(input_long)} );</script> You entered: {escape(input_lat)}, {escape(input_long)}</body></html>"
