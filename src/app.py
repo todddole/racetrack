@@ -9,7 +9,7 @@ app = Flask(__name__)
 def main():
     return '''
      <form action="/echo_user_input" method="POST">
-         Lattitude:<input name="lattitude">
+         Latitude:<input name="latitude">
 	 Longitude:<input name="longitude">
          <input type="submit" value="Submit!">
      </form>
@@ -17,6 +17,6 @@ def main():
 
 @app.route("/echo_user_input", methods=["POST"])
 def echo_input():
-    input_lat = request.form.get("lattitude", "")
+    input_lat = request.form.get("latitude", "")
     input_long = request.form.get("longitude", "")
     return render_template('map.html') + f"<script>initMap( {escape(input_lat)}, {escape(input_long)} );</script> You entered: {escape(input_lat)}, {escape(input_long)}</body></html>"
