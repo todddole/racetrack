@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+# by Todd Dole
+# MVP web application for Software Architecture project
+# Prompts user to input a latitude and longitude
+# Then displays the location on a google map
+
 from flask import Flask, request, url_for, render_template
 from markupsafe import escape
 

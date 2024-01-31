@@ -1,0 +1,33 @@
+from dotenv import load_dotenv
+import os
+import json
+import pymongo
+
+class LocationDataGateway:
+    def __init__(self):   
+        self.db = self.setup_db()
+
+    def setup_db(self):
+        """
+        Configuration method to return db instance
+        """
+
+        load_dotenv()
+        dbString = f'mongodb+srv://temp_user:{os.environ.get("password")}'\
+        '@rtcluster0.pctg1sv.mongodb.net/?retryWrites=true&w=majority'
+
+        client = pymongo.MongoClient(dbString) # establish connection
+        mongo_db = client.db
+        #mongo_db.racetrack.drop()
+    
+        return mongo_db
+
+    def add_data(self, id, data):
+        x=self.db.racetrack.insert_one({"_id": id, "data":data}).inserted_id
+
+        return x
+
+    def del_data(self, id):
+        return self.db.racetrack.delete_one({"_id": id}).deleted_count
+
+

@@ -1,3 +1,5 @@
+By Todd Dole 
+
 This is a project for "Applications of Software Architecture for Big Data" in the University of Colorado Boulder MS-CS program.
 
 In the world of endurance racing (Ironman triathlon, trail running/ultramarathons, ultracycling, adventure racing) tracking the physical location of athletes on course is extremely important for event organizers, referees, and spectators.
