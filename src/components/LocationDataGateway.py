@@ -13,7 +13,7 @@ class LocationDataGateway:
         """
 
         load_dotenv()
-        dbString = f'mongodb+srv://temp_user:{os.environ.get("password")}'\
+        dbString = f'mongodb+srv://racecollector:{os.environ.get("password")}'\
         '@rtcluster0.pctg1sv.mongodb.net/?retryWrites=true&w=majority'
 
         client = pymongo.MongoClient(dbString) # establish connection
@@ -22,12 +22,26 @@ class LocationDataGateway:
     
         return mongo_db
 
-    def add_data(self, id, data):
-        x=self.db.racetrack.insert_one({"_id": id, "data":data}).inserted_id
-
+    def add_data(self, id, data, collection_name):
+        try:
+            dbcollection = self.db[collection_name]
+            x=dbcollection.insert_one({"_id": id, "data":data}).inserted_id
+        except Exception as e:
+            return None
         return x
 
-    def del_data(self, id):
-        return self.db.racetrack.delete_one({"_id": id}).deleted_count
+    def del_data(self, id, collection_name):
+        try:
+            dbcollection = self.db[collection_name]
+            return dbcollection.delete_one({"_id": id}).deleted_count
+        except Exception as e:
+            return None
+
+    def get_data(self, id, collection_name):
+        try:
+            dbcollection = self.db[collection_name]
+            return dbcollection.find_one({"_id":id})['data']
+        except Exception as e:
+            return None
 
 
