@@ -1,5 +1,21 @@
 #!/usr/bin/env python3
 
+# Changelog
+# V0.1 February 1
+#
+# V0.8 February 9, :
+#   Pull athlete info from DB
+#   Set up and start race
+#   Plot graph of race
+#   Implemented Swim, T1, Bike, T2
+#
+# V 0.9 February 10:
+#   Implemented Run, Finish
+#   Moved athlete start to separate thread
+#   Output race results to CSV file
+
+
+
 from src.components.LocationDataGateway import LocationDataGateway
 from src.components.Athlete import Athlete
 import os
@@ -14,11 +30,43 @@ import math
 import numpy as np
 import pandas as pd
 from shapely.geometry import Point, Polygon
+from threading import Thread
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
+import datetime
+
 
 race = None
+#----- Constants
+
+#Speedfactor - Reduces sleep times by this amount.  60 = cycles 1 hour of race time per 1 minute real time
+SPEEDFACTOR = 9999
+LOGLEVEL = logging.INFO
+SHOWPLT = False
+
+class RaceStarter(Thread):
+
+    def setup(self, myrace):
+        self.srace = myrace
+
+
+    def run(self):
+        while len(self.srace.athletelist) > 0:
+            athlete = self.srace.athletelist.pop()
+            athlete.start()
+            self.srace.racinglist.append(athlete)
+
+
+            self.srace.started += 1
+            if (SPEEDFACTOR!=9999):
+                time.sleep(self.srace.startinterval / SPEEDFACTOR)
+
+
+
+
+
+
 
 def show_map():
     dlist = []
@@ -66,17 +114,48 @@ def move_along(point1, point2, met_dist):
 def customAthleteDecoder(athleteDict):
     return namedtuple('X', athleteDict.keys())(*athleteDict.values())
 
+
+
 class RaceAthlete(Athlete):
+    def __str__(self):
+        outstr = ""
+        outstr += self.name
+        # Status and finish time
+        outstr += ","
+        outstr += str(self.status)
+
+        outstr += ","
+        outstr += str(datetime.timedelta(seconds=self.swimsec + self.t1sec + self.bikesec + self.t2sec + self.runsec))
+
+        outstr += ","
+        outstr += str(datetime.timedelta(seconds=self.swimsec))
+        outstr += ","
+        outstr += str(datetime.timedelta(seconds=self.t1sec))
+        outstr += ","
+        outstr += str(datetime.timedelta(seconds=self.bikesec))
+        outstr += ","
+        outstr += str(datetime.timedelta(seconds=self.t2sec))
+        outstr += ","
+        outstr += str(datetime.timedelta(seconds=self.runsec))
+        outstr += ","
+        outstr += str(self.location[0])
+        outstr += ","
+        outstr += str(self.location[1])
+
+        return outstr
+
+
     def __init__(self, *args):
         Athlete.__init__(self, *args)
         global race
         if (self.gender=='male'):
             swimrec = race.swimrecmale
             bikerec = race.bikerecmale
+            runrec = race.runrecmale
         else:
             swimrec = race.swimrecfemale
             bikerec = race.bikerecfemale
-
+            runrec = race.runrecfemale
         swimcut = race.swimcut
 
 
@@ -86,9 +165,15 @@ class RaceAthlete(Athlete):
 
         bikecut = race.bikecut
 
-        biketimepct=1 - (self.bikestr / 100) + random.uniform(-.07, 0.03)
+        biketimepct=1 - (self.bikestr / 100) + random.uniform(-.07, 0.03) * race.windfactor
         biketime = ((bikecut - bikerec) * biketimepct) + bikerec
         self.bikespd = 180000 / biketime
+
+
+        runcut = (60*60*8)
+        runtimepct = 1 - (self.runstr / 100) + random.uniform(-.07, 0.03) * race.heatfactor
+        runtime = ((runcut - runrec) * runtimepct) + runrec
+        self.runspd = 42000 / runtime
 
         self.location = race.swimcrs[0]
 
@@ -111,6 +196,14 @@ class RaceAthlete(Athlete):
         logging.debug("Race Start: " + self.name + " has entered the water! " + str(len(race.athletelist)) + " to go")
 
 
+    def start_run(self):
+        self.status=5
+        self.leg=0
+        self.location = race.runcrs[0]
+        logging.debug("Run Start: " + self.name + " has entered the bike course!")
+        race.t2ers -= 1
+        race.runners += 1
+
     def start_bike(self):
         self.status=3
         self.leg = 0
@@ -119,12 +212,23 @@ class RaceAthlete(Athlete):
         race.t1ers -=1
         race.bikers += 1
 
+    def finish(self, addtime):
+        self.status = 10
+        self.leg = 0
+        self.runsec += addtime
+        logging.info ("" + self.name + ", you are an IRONMAN!!!  "+
+                      str(datetime.timedelta(seconds=(self.swimsec + self.bikesec + self.runsec +
+                                                      self.t1sec + self.t2sec))))
+        race.runners -= 1
+        race.finishers += 1
+
+
     def transition_One(self, addtime):
         self.status = 2
         self.leg = 0
         self.t1sec = addtime
         self.t1left = random.randint(90,600) - addtime
-        logging.info("Swim Finish: " + self.name + " is out of the water! "+str(self.swimsec // 60) + ":"+str(self.swimsec % 60) + " -- swim str = " + str(self.swimstr))
+        logging.debug("Swim Finish: " + self.name + " is out of the water! "+str(self.swimsec // 60) + ":"+str(self.swimsec % 60) + " -- swim str = " + str(self.swimstr))
         race.swimmers -= 1
         race.t1ers +=1
 
@@ -133,18 +237,74 @@ class RaceAthlete(Athlete):
         self.leg = 0
         self.t2sec = addtime
         self.t2left = random.randint(90, 600) - addtime
-        logging.info("Bike Finish: " + self.name + " is off the bike! " + str(self.bikesec // 60) + ":" + str(
+        logging.debug("Bike Finish: " + self.name + " is off the bike! " + str(self.bikesec // 60) + ":" + str(
             self.bikesec % 60) + " -- bike str = " + str(self.bikestr))
         race.bikers -= 1
         race.t2ers += 1
 
     def advance(self, cycletime):
 
-        if (self.status==3):
+        if (self.status==5):
+            if (random.randint(1,5000) == 5000):
+                logging.info(self.name + " has bonked and decided to throw in the towel!!")
+                self.status=99
+                race.runners-=1
+                race.dnfers += 1
+                return 99
+
+            # running, update position
+            speedrandom = random.uniform(.9, 1.1)
+            met_distance = self.runspd * speedrandom * cycletime
+
+            rundone = False
+            addtime = cycletime
+            origmetdistance = met_distance
+
+            while (met_distance>0) and (not rundone):
+                # check distance of next waypoint
+                legdist = distance.distance(self.location, race.runcrs[self.leg+1]).m
+
+
+                if (legdist < met_distance):
+                    legtime = int(cycletime * (legdist / origmetdistance))
+                    addtime -= legtime
+                    self.runsec += legtime
+                    met_distance -= legdist
+                    self.location = race.runcrs[self.leg+1]
+                    self.leg+=1
+                    logging.debug(self.name + " finished run leg " + str(self.leg))
+                    if (self.leg==len(race.runcrs) -1):
+                        rundone = True
+                        self.finish(addtime)
+                        return 99
+
+
+                else:
+                    self.runsec += addtime
+                    newloc = move_along(self.location, race.runcrs[self.leg+1], met_distance)
+
+                    #logging.info(self.name + " moved from " + str(self.location) + " to " + str(newloc))
+                    self.location = newloc
+                    met_distance = 0
+                    if (self.swimsec + self.bikesec + self.runsec + self.t1sec + self.t2sec > race.racecut):
+                        # missed the cutoff, pull them out
+                        self.status=99
+                        logging.info(self.name + " failed to finish before midnight." + " -- run str = " + str(self.runstr))
+                        race.runners-=1
+                        race.dnfers += 1
+                        return 99
+
+        elif (self.status==4):
+            self.t2left -= cycletime
+            if (self.t2left <= 0):
+                self.start_run()
+
+        elif (self.status==3):
             if (random.randint(1,5000) == 5000):
                 logging.info(self.name + " was in a brutal accident and has dropped out!!")
                 self.status=99
                 race.bikers-=1
+                race.dnfers += 1
                 return 99
 
             # biking, update position
@@ -161,8 +321,9 @@ class RaceAthlete(Athlete):
 
 
                 if (legdist < met_distance):
-                    addtime -= int(cycletime * (legdist / origmetdistance))
-                    self.swimsec += addtime
+                    legtime = int(cycletime * (legdist / origmetdistance))
+                    addtime -= legtime
+                    self.bikesec += legtime
                     met_distance -= legdist
                     self.location = race.bikecrs[self.leg+1]
                     self.leg+=1
@@ -184,6 +345,7 @@ class RaceAthlete(Athlete):
                         self.status=99
                         logging.info(self.name + " failed to make the bike cutoff, joined the sag wagon!!" + " -- bike str = " + str(self.bikestr))
                         race.bikers-=1
+                        race.dnfers += 1
                         return 99
 
         elif (self.status==2):
@@ -197,6 +359,7 @@ class RaceAthlete(Athlete):
                 logging.info(self.name + " was eaten by a shark!!")
                 self.status=99
                 race.swimmers-=1
+                race.dnfers += 1
                 return 99
 
             # swimming, update position
@@ -215,8 +378,9 @@ class RaceAthlete(Athlete):
 
 
                 if (legdist < met_distance):
-                    addtime -= int(cycletime * (legdist / origmetdistance))
-                    self.swimsec += addtime
+                    legtime = int(cycletime * (legdist / origmetdistance))
+                    addtime -= legtime
+                    self.swimsec += legtime
                     met_distance -= legdist
                     self.location = race.swimcrs[self.leg+1]
                     self.leg+=1
@@ -238,9 +402,10 @@ class RaceAthlete(Athlete):
                         self.status=99
                         logging.info(self.name + " failed to make the swim cutoff, pulled out of the water!!" + " -- swim str = " + str(self.swimstr))
                         race.swimmers -= 1
+                        race.dnfers += 1
                         return 99
 
-        if (self.status==4) or (self.status==99) :
+        if (self.status>=10):
             return 99
         return self.status
 
@@ -254,13 +419,18 @@ class Race:
         self.swimmers = 0
         self.bikers = 0
         self.runners=0
+        self.finishers = 0
+        self.dnfers = 0
         self.t1ers = 0
         self.t2ers = 0
 
         self.swimcrs = [
             (19.639572, -155.995188),
-            (19.625730, -155.990528),
-            (19.625243, -155.993085),
+            (19.637690, -155.994440),
+            (19.635070, -155.993390),
+            (19.628160, -155.990120),
+            (19.624510, -155.988290),
+            (19.624410, -155.989660),
             (19.639260, -155.996217),
             (19.639377, -155.996689)
 
@@ -1768,6 +1938,334 @@ class Race:
             (19.640017, -155.997058)
         ]
 
+        self.runcrs = [
+            (19.6399178, -155.9970403),
+            (19.6400108, -155.996994),
+            (19.6401749, -155.9968095),
+            (19.640283, -155.996762),
+            (19.6406759, -155.9969697),
+            (19.6407972, -155.9969745),
+            (19.640861, -155.9969557),
+            (19.641744, -155.9962712),
+            (19.6417664, -155.9961752),
+            (19.641678, -155.996036),
+            (19.6413242, -155.9955029),
+            (19.6411904, -155.9952813),
+            (19.6410373, -155.9949441),
+            (19.6409289, -155.9945219),
+            (19.6405971, -155.9927724),
+            (19.6404995, -155.9924295),
+            (19.6404017, -155.9921996),
+            (19.6402787, -155.9919892),
+            (19.6400903, -155.9917251),
+            (19.6399268, -155.9915486),
+            (19.639771, -155.9914082),
+            (19.6392995, -155.9910851),
+            (19.6385565, -155.9906997),
+            (19.6384906, -155.9906938),
+            (19.6384478, -155.9907147),
+            (19.6384198, -155.9907461),
+            (19.6374836, -155.9925878),
+            (19.637434, -155.9925992),
+            (19.6372799, -155.9924431),
+            (19.6356084, -155.990707),
+            (19.6354449, -155.9905425),
+            (19.6352947, -155.9904257),
+            (19.6351245, -155.9903181),
+            (19.6345995, -155.990043),
+            (19.6344441, -155.9899708),
+            (19.6307761, -155.9885798),
+            (19.6298781, -155.9882907),
+            (19.6287363, -155.9880117),
+            (19.6268958, -155.9876669),
+            (19.6266859, -155.9876172),
+            (19.6264361, -155.9875373),
+            (19.6261435, -155.9874206),
+            (19.6259312, -155.987318),
+            (19.625727, -155.9872053),
+            (19.6254411, -155.9870188),
+            (19.6251631, -155.9867977),
+            (19.6243253, -155.9860069),
+            (19.6241771, -155.9858799),
+            (19.6240414, -155.9857747),
+            (19.6237678, -155.9856359),
+            (19.6235265, -155.9855696),
+            (19.6227524, -155.9853867),
+            (19.6213, -155.9850123),
+            (19.6201782, -155.9846484),
+            (19.6196152, -155.9844375),
+            (19.6189215, -155.9841433),
+            (19.6179645, -155.9837076),
+            (19.6171071, -155.9833247),
+            (19.6161763, -155.9828979),
+            (19.6153023, -155.9824668),
+            (19.6148757, -155.9822358),
+            (19.614207, -155.9818301),
+            (19.6136275, -155.9814417),
+            (19.6108656, -155.9794264),
+            (19.6104894, -155.9791851),
+            (19.6094263, -155.9784086),
+            (19.6091055, -155.9781206),
+            (19.6081276, -155.977204),
+            (19.6079048, -155.9770266),
+            (19.6068224, -155.9764919),
+            (19.606591, -155.9763388),
+            (19.6063377, -155.9761055),
+            (19.60573, -155.9755136),
+            (19.6044649, -155.9747212),
+            (19.604159, -155.9745753),
+            (19.6038981, -155.9745059),
+            (19.6035513, -155.9744203),
+            (19.6032989, -155.9743989),
+            (19.6029252, -155.9744214),
+            (19.6019229, -155.9745747),
+            (19.6015595, -155.9746156),
+            (19.6013637, -155.9746238),
+            (19.6010239, -155.9746073),
+            (19.6006327, -155.9745559),
+            (19.6001262, -155.9744724),
+            (19.6006157, -155.9745536),
+            (19.6010069, -155.9746074),
+            (19.6013456, -155.9746226),
+            (19.601538, -155.9746173),
+            (19.6019029, -155.974576),
+            (19.6029074, -155.9744242),
+            (19.6032767, -155.9743985),
+            (19.6035273, -155.9744185),
+            (19.6038762, -155.9744994),
+            (19.604147, -155.9745703),
+            (19.6044536, -155.9747132),
+            (19.6057154, -155.9755038),
+            (19.6063251, -155.9760926),
+            (19.6065759, -155.9763264),
+            (19.6068123, -155.9764846),
+            (19.6078958, -155.9770207),
+            (19.608119, -155.9771962),
+            (19.6090911, -155.9781072),
+            (19.609416, -155.9783995),
+            (19.6104782, -155.9791762),
+            (19.6108557, -155.9794194),
+            (19.6136176, -155.9814336),
+            (19.6141939, -155.9818225),
+            (19.6148643, -155.9822293),
+            (19.6152927, -155.9824613),
+            (19.6161663, -155.9828922),
+            (19.6170947, -155.9833187),
+            (19.6179551, -155.9837032),
+            (19.6189097, -155.9841389),
+            (19.6196036, -155.9844325),
+            (19.6201656, -155.9846436),
+            (19.6212883, -155.9850082),
+            (19.6227359, -155.9853804),
+            (19.6235137, -155.9855657),
+            (19.6237566, -155.9856321),
+            (19.6240295, -155.9857667),
+            (19.6241679, -155.9858695),
+            (19.6243136, -155.9859964),
+            (19.6251516, -155.9867868),
+            (19.6254293, -155.9870091),
+            (19.6257123, -155.9871961),
+            (19.6259184, -155.9873123),
+            (19.6261297, -155.9874168),
+            (19.6264216, -155.9875309),
+            (19.6266674, -155.9876103),
+            (19.6268797, -155.9876625),
+            (19.6287223, -155.9880087),
+            (19.6298698, -155.9882871),
+            (19.6307706, -155.988577),
+            (19.6344322, -155.9899659),
+            (19.6345913, -155.9900362),
+            (19.6351197, -155.9903157),
+            (19.6352954, -155.9904222),
+            (19.6354447, -155.9905425),
+            (19.6356096, -155.9907069),
+            (19.6372785, -155.9924421),
+            (19.6373829, -155.9924702),
+            (19.6374578, -155.9924735),
+            (19.6375136, -155.9924404),
+            (19.6375709, -155.992364),
+            (19.6383382, -155.9908417),
+            (19.6384338, -155.9906336),
+            (19.6393005, -155.9910806),
+            (19.6397775, -155.9914143),
+            (19.6399379, -155.9915608),
+            (19.6401039, -155.9917371),
+            (19.6402875, -155.9920012),
+            (19.640411, -155.9922169),
+            (19.6405082, -155.9924496),
+            (19.6406012, -155.9927895),
+            (19.6409327, -155.9945362),
+            (19.6410442, -155.9949617),
+            (19.6412012, -155.9952968),
+            (19.6413366, -155.9955224),
+            (19.6418133, -155.9961022),
+            (19.6420409, -155.9961035),
+            (19.6421886, -155.9960268),
+            (19.6443452, -155.9947887),
+            (19.646245, -155.9937901),
+            (19.6465336, -155.9937699),
+            (19.6469771, -155.9947263),
+            (19.650054, -156.0006988),
+            (19.650372, -156.0012449),
+            (19.6507424, -156.0018223),
+            (19.6512259, -156.0024921),
+            (19.6519867, -156.0033324),
+            (19.6529867, -156.0042693),
+            (19.6536121, -156.0047816),
+            (19.6547732, -156.0055944),
+            (19.6580876, -156.0072055),
+            (19.6605224, -156.0083501),
+            (19.6611216, -156.0086246),
+            (19.6619144, -156.0090791),
+            (19.6622506, -156.0092799),
+            (19.6626343, -156.0095216),
+            (19.6629854, -156.0097514),
+            (19.6638161, -156.0102608),
+            (19.6648581, -156.0109504),
+            (19.6673157, -156.0125883),
+            (19.6712326, -156.0151646),
+            (19.6732375, -156.0164993),
+            (19.6758386, -156.0181627),
+            (19.6768083, -156.0186891),
+            (19.6774528, -156.0189702),
+            (19.6782884, -156.019308),
+            (19.6788372, -156.0194886),
+            (19.6805939, -156.0199807),
+            (19.6828644, -156.0204709),
+            (19.6847186, -156.0209323),
+            (19.6865391, -156.0213489),
+            (19.6874222, -156.0215861),
+            (19.6881183, -156.0218099),
+            (19.6893262, -156.022291),
+            (19.6902086, -156.0227191),
+            (19.6908718, -156.0230824),
+            (19.6917131, -156.0235624),
+            (19.6998435, -156.02863),
+            (19.7007871, -156.0291756),
+            (19.70397, -156.031202),
+            (19.7049168, -156.0317934),
+            (19.7060345, -156.0324183),
+            (19.7068289, -156.0327866),
+            (19.7074253, -156.0330068),
+            (19.7081224, -156.0332366),
+            (19.7088007, -156.0334173),
+            (19.7095036, -156.0335675),
+            (19.7105347, -156.0337152),
+            (19.7111381, -156.0337606),
+            (19.7117556, -156.0337709),
+            (19.7124718, -156.0337405),
+            (19.7140308, -156.0335532),
+            (19.715986, -156.0332398),
+            (19.7172722, -156.0330284),
+            (19.7186358, -156.032816),
+            (19.7204949, -156.0325069),
+            (19.721656, -156.0323087),
+            (19.7253618, -156.0316288),
+            (19.7255452, -156.0321314),
+            (19.7256917, -156.0328565),
+            (19.7255888, -156.0336716),
+            (19.7247456, -156.0339618),
+            (19.7172324, -156.035434),
+            (19.7164015, -156.0356064),
+            (19.7162174, -156.035621),
+            (19.7159644, -156.0355992),
+            (19.7158999, -156.035621),
+            (19.7158628, -156.0356625),
+            (19.7158382, -156.035703),
+            (19.715545, -156.0382773),
+            (19.7153563, -156.0398137),
+            (19.714431, -156.0475659),
+            (19.7144456, -156.0477021),
+            (19.7144998, -156.0478388),
+            (19.7145805, -156.0479547),
+            (19.7148857, -156.0481711),
+            (19.7211692, -156.0527174),
+            (19.7256796, -156.0560026),
+            (19.7256685, -156.0560243),
+            (19.7211299, -156.0527869),
+            (19.7147581, -156.0481402),
+            (19.7145995, -156.0480114),
+            (19.7145006, -156.0478968),
+            (19.7144367, -156.0477706),
+            (19.7144057, -156.047645),
+            (19.7144061, -156.0475045),
+            (19.7158121, -156.0355932),
+            (19.7159639, -156.0355351),
+            (19.716269, -156.0355543),
+            (19.7166241, -156.0355036),
+            (19.717215, -156.0353697),
+            (19.7244448, -156.0339084),
+            (19.7247705, -156.0338367),
+            (19.7254662, -156.0335647),
+            (19.7255416, -156.0328586),
+            (19.7254179, -156.0321536),
+            (19.7253054, -156.0317669),
+            (19.7252677, -156.0317214),
+            (19.7235484, -156.0320045),
+            (19.7224254, -156.0322121),
+            (19.7191081, -156.032781),
+            (19.7168034, -156.0331386),
+            (19.7158493, -156.0333008),
+            (19.7139405, -156.033634),
+            (19.7122468, -156.0338184),
+            (19.7108627, -156.0337938),
+            (19.7094001, -156.0336045),
+            (19.7080187, -156.0332686),
+            (19.7066501, -156.0327763),
+            (19.704902, -156.0318496),
+            (19.703222, -156.0307809),
+            (19.6998827, -156.0287191),
+            (19.6970663, -156.0269555),
+            (19.691482, -156.023529),
+            (19.6890871, -156.0222476),
+            (19.6876976, -156.0217351),
+            (19.6862341, -156.0213333),
+            (19.6828048, -156.0205156),
+            (19.6807758, -156.0200423),
+            (19.6788192, -156.0195322),
+            (19.677135, -156.0189004),
+            (19.6759216, -156.0182641),
+            (19.6743497, -156.0172622),
+            (19.668402, -156.013347),
+            (19.6637732, -156.0103133),
+            (19.6614485, -156.0088518),
+            (19.6604036, -156.0083507),
+            (19.6550319, -156.0057967),
+            (19.6539815, -156.0051199),
+            (19.6525913, -156.0040051),
+            (19.6511484, -156.0024864),
+            (19.6500402, -156.0007736),
+            (19.6466847, -155.9942881),
+            (19.6464821, -155.9938579),
+            (19.6459393, -155.9939942),
+            (19.6432496, -155.9954632),
+            (19.6420506, -155.9961445),
+            (19.6417922, -155.9961227),
+            (19.6413261, -155.995503),
+            (19.6411813, -155.9952675),
+            (19.6410317, -155.9949242),
+            (19.6409266, -155.9945051),
+            (19.6405912, -155.9927503),
+            (19.6404983, -155.9924162),
+            (19.6403961, -155.9921837),
+            (19.6402723, -155.991979),
+            (19.6400823, -155.9917137),
+            (19.6399251, -155.9915466),
+            (19.639771, -155.991407),
+            (19.6392986, -155.9910817),
+            (19.6385567, -155.9906983),
+            (19.6384937, -155.9906928),
+            (19.6384459, -155.9907145),
+            (19.6384181, -155.9907479),
+            (19.637542, -155.9925406),
+            (19.6375468, -155.9926079),
+            (19.6375692, -155.9926886),
+            (19.6380053, -155.9931088),
+            (19.638172, -155.9932435),
+            (19.6389512, -155.993744),
+            (19.6391514, -155.993898)
+        ]
+
         self.startinterval = 6
 
         self.swimrecmale = 2789
@@ -1777,6 +2275,14 @@ class Race:
         self.bikerecmale = (60*60*4) + (60*4) + 36
         self.bikerecfemale = (60*60*4) + (60*26) + 7
         self.bikecut = (60*60*8)
+
+        self.runrecmale = (60*60*2) + (60*36) + 15
+        self.runrecfemale = (60*60*2) + (60*48) + 23
+        self.racecut = (60*60*17)
+
+        self.windfactor = random.uniform(0.9, 1.02)
+        self.heatfactor = random.uniform(0.9, 1.02)
+
 
         try:
             self.athletecount = int(os.environ.get("ATH_COUNT"))
@@ -1795,7 +2301,8 @@ class Race:
     def start_race(self):
         self.starttime = time.time()
         self.isdone = False
-        logging.info("Starting race at " + str(self.starttime))
+        logging.info("Starting race at " + str(self.starttime), "  windfactor=" + str(self.windfactor) +
+                     "  heatfactor=" + str(self.heatfactor))
         self.racinglist = []
         self.finishedlist = []
 
@@ -1809,18 +2316,7 @@ class Race:
         self.updatetime = time.time()
 
         # check if athletes have all started
-        if (self.started < self.athletecount):
-            numtostart = cycletime // self.startinterval
-            if (self.started + numtostart > self.athletecount):
-                numtostart = self.athletecount - self.started
 
-            for i in range(numtostart):
-                athlete = self.athletelist.pop()
-                athlete.start()
-                self.racinglist.append(athlete)
-
-
-            self.started += numtostart
 
         # advance each athlete
         for ath in self.racinglist:
@@ -1863,7 +2359,7 @@ def load_athletes(athletecount):
 if __name__ == '__main__':
 
     load_dotenv()
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=LOGLEVEL)
     logging.info('Starting HawaiiSim')
 
     race = Race()
@@ -1876,30 +2372,43 @@ if __name__ == '__main__':
     logging.info('Loaded ' + str(len(race.athletelist)) + ' athletes')
 
 
-    for ath in race.athletelist:
-        print(ath.name + ' - Swim Speed:' + str(ath.swimspd) + " m/s")
+    #for ath in race.athletelist:
+     #   print(ath.name + ' - Swim Speed:' + str(ath.swimspd) + " m/s")
 
     race.start_race()
+
+    starter = RaceStarter()
+    starter.setup(race)
+    starter.start()
+
     cycles = 0
 
     while not race.is_done():
         race.update_status(cycletime)
 
         cycles+=1
-        if (cycles == 30):
-            show_map()
-            cycles=0
+        if (cycles % 10 == 0):
             logging.info("Swimmers: " + str(race.swimmers) + "  |  T1: "+str(race.t1ers)+
-                         "  |  Bike: " + str(race.bikersers) + "  |  T2: " + str(race.t2ers) +
-                         "  |  Run: " + str(race.runners))
+                         "  |  Bike: " + str(race.bikers) + "  |  T2: " + str(race.t2ers) +
+                         "  |  Run: " + str(race.runners) + "  |  Finished: " + str(race.finishers) +
+                         "  |  DNF: " + str(race.dnfers))
+        if (cycles == 60):
+            if (SHOWPLT):
+                show_map()
+            cycles=0
 
+        if (SPEEDFACTOR!=9999):
+            time.sleep(cycletime / SPEEDFACTOR)
 
+    logging.info("Writing race results to data/raceresults.csv")
 
+    f = open("data/raceresults.csv", "w")
 
+    logging.info("Finished List contains " + str(len(race.finishedlist)) + " athletes.")
+    for athlete in race.finishedlist:
+        f.write(str(athlete))
+        f.write("\n")
 
-
-
-
-        time.sleep(cycletime / 60)
+    f.close()
 
 
