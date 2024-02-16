@@ -36,6 +36,10 @@
 # V1.2
 #   Bug Fixes
 #   Reconfigured location reporting to prevent buildup of api calls
+#
+# V1.21
+#   Added race start time to the database
+#
 
 
 
@@ -2610,6 +2614,7 @@ class Race:
         self.isdone = False
         logging.info("Starting race at " + str(self.starttime) + "  windfactor=" + str(self.windfactor) +
                      "  heatfactor=" + str(self.heatfactor))
+        self.report_data("starttime", self.starttime)
         self.racinglist = []
         self.finishedlist = []
 
