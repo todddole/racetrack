@@ -5,6 +5,7 @@
 # version 0.5: initial prototype
 # version 1.0: updated 2/9/2024 to add mongodb connectivity and device id
 # version 1.1: added error handling
+# version 1.2: added division, pros.  Changed device id and athlete id to conserve memory
 
 
 from src.components.LocationDataGateway import LocationDataGateway
@@ -15,7 +16,7 @@ import requests
 import json
 import time
 import numpy as np
-import base64
+
 
 from flask_restful.inputs import url
 
@@ -113,7 +114,7 @@ def generateAthlete(athleteid, deviceid, category):
         if (athgender=='male'):
             division='AGM'
         else:
-            divison='AGF'
+            division='AGF'
 
 
     athlete=Athlete(athname, athgender, athbirthdate, athswimstr, athbikestr, athrunstr, division, ourdeviceid)
@@ -125,8 +126,8 @@ if __name__ == '__main__':
     idlist = []
     ldg = LocationDataGateway()
 
-    athleteid=0
-    deviceid=0
+    athleteid=2844
+    deviceid=2844
     category = 0
 
     for i in range(10000):

@@ -19,7 +19,7 @@ import json
 app = Flask(__name__)
 #api = Api(app)
 API_KEY = ""
-DEFAULT_API_KEY = "youareanironman"
+DEFAULT_API_KEY = "2468appreciate"
 
 @app.route('/data', methods=['GET'])
 def get_data():
@@ -37,18 +37,42 @@ def put_data(data_key:str):
         return response
 
     # Request is authorized.  Add to DB
+    if data_key == "multipart":
+        if type(data)==str :
+            data = json.loads(data)
+        retstat = 201
+        try:
+            ldg = LocationDataGateway()
 
-    try:
-        ldg = LocationDataGateway()
+            for key in data:
+                value = data[key]
 
-        x=ldg.add_data(data_key, data, colname)
-    except Exception as e:
-        x=0
+                x = ldg.add_data(key, value, colname)
+                if (x!=key):
+                    print("  Error: x=" + x + " key=" + key + " value=" + value)
+                    retstat = 500
 
-    if (x==data_key):
-        response = Response(status=201)
+        except Exception as e:
+            retstat = 500
+
+        if (retstat == 201):
+            response = Response(status=201)
+        else:
+            response = Response(status=500)
+
     else:
-        response = Response(status=500)
+
+        try:
+            ldg = LocationDataGateway()
+
+            x = ldg.add_data(data_key, data, colname)
+        except Exception as e:
+            x = 0
+
+        if (x == data_key):
+            response = Response(status=201)
+        else:
+            response = Response(status=500)
     return response
 
 	
@@ -59,4 +83,5 @@ def put_data(data_key:str):
 
 if __name__ == '__main__':
     API_KEY = os.getenv("API_KEY", DEFAULT_API_KEY)
-    app.run(debug=True, port=5000)
+    print("API KEY: " + API_KEY)
+    app.run(debug=False, port=5000)

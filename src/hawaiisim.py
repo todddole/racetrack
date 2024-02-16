@@ -32,10 +32,15 @@
 #   Improved Location Reporting - includes device id and time stamp as fields, shorter _id
 #   Added race categories and separate starts for MPRO, FPRO
 #   Improved ApiReporter to include priority
+#
+# V1.2
+#   Bug Fixes
+#   Reconfigured location reporting to prevent buildup of api calls
 
 
-from src.components.LocationDataGateway import LocationDataGateway
-from src.components.Athlete import Athlete
+
+from components.LocationDataGateway import LocationDataGateway
+from components.Athlete import Athlete
 import os
 import random
 import json
@@ -63,14 +68,18 @@ race = None
 #----- Constants
 
 #Speedfactor - Reduces sleep times by this amount.  60 = cycles 1 hour of race time per 1 minute real time
-SPEEDFACTOR = 60
+SPEEDFACTOR = 1
 LOGLEVEL = logging.INFO
 SHOWPLT = False
 DEFAULT_API_URL = "http://localhost:5000/data/"
 DEFAULT_API_KEY = "youareanironman"
+REPORT_WORKER = 10
 device_count={}
 
 class ApiReporter(Thread):
+    # Maintains a high priority and low priority queue
+    # Accepts data on queues for transmission to rest api
+    # transmits data from queue
     def setup(self, api_url, api_key):
         self.q = Queue()
         self.pq = Queue()
@@ -93,7 +102,7 @@ class ApiReporter(Thread):
             elif (not self.q.empty()):
                 item = self.q.get()
             else:
-                time.sleep(1)
+                time.sleep(0.1)
                 continue
 
             key = item["key"]
@@ -104,13 +113,14 @@ class ApiReporter(Thread):
                 response = requests.post(url, data=json.dumps(data),
                                          headers={"Content-Type":"application/json"})
                 if response.status_code != 201:
-                    logging.error("Api error: Post Status Code " + str(response.status_code))
-                    logging.error("  URL: " + url)
-                    logging.error("  json: " + str(data))
+                    logging.debug("Api error: Post Status Code " + str(response.status_code))
+                    logging.debug("  URL: " + url)
+                    logging.debug("  json: " + str(data))
             except Exception as e:
-                logging.error("Api exception!!")
+                logging.debug("Api exception!!")
 
 class DataReporter(Thread):
+    # Passes data to ApiReporters for transmission to API
     def setup(self, myrace, api_url, api_key):
         self.srace = myrace
         self.q = Queue()
@@ -118,18 +128,26 @@ class DataReporter(Thread):
         self.finished = False
         self.api_url = api_url
         self.api_key = api_key
+        self.threadlist = []
 
     def report(self, item, priority=False):
         if (priority):
             self.pq.put(item)
         else:
             self.q.put(item)
+
+    def queuesize(self):
+        qsize = 0
+        for i in self.threadlist:
+            qsize+=i.q.qsize() + i.pq.qsize()
+        return qsize
+
     def run(self):
-        threadlist = []
-        for i in range(20):
-            threadlist.append(ApiReporter())
-            threadlist[i].setup(self.api_url, self.api_key)
-            threadlist[i].start()
+
+        for i in range(REPORT_WORKER):
+            self.threadlist.append(ApiReporter())
+            self.threadlist[i].setup(self.api_url, self.api_key)
+            self.threadlist[i].start()
 
         whichthread = 0
         while (not self.finished) or (not self.pq.empty()) or (not self.q.empty()):
@@ -147,19 +165,23 @@ class DataReporter(Thread):
                      "colname" : item["colname"],
                      "api-key" : self.api_key}
             everything = {"key":key, "data":data}
-            threadlist[whichthread].add(everything, )
+            self.threadlist[whichthread].add(everything)
             whichthread += 1
-            if (whichthread > 19): whichthread = 0
+            if (whichthread >= REPORT_WORKER): whichthread = 0
 
         # Shutdown the worker threads
-        for i in range(20):
-            threadlist[i].finish()
+        for i in range(REPORT_WORKER):
+            self.threadlist[i].finish()
 
     def finish(self):
         self.finished = True
 
 
 class RaceStarter(Thread):
+    # Signals athletes to start race
+    # Pro Men start first in a mass start
+    # Pro Women start second in a mass start 10 minutes later
+    # Age group athletes start 10 minutes later in a rolling start, one athlete per startinterval seconds
 
     def setup(self, myrace):
         self.srace = myrace
@@ -235,6 +257,8 @@ def show_map():
 
 def get_bearing(point1, point2):
     # copied from google search
+    # gives an approximate bearing between two locations
+    # seems to be slightly inaccurate
 
     lat1, lon1 = point1[0], point1[1]
     lat2, lon2 = point2[0], point2[1]
@@ -250,6 +274,7 @@ def get_bearing(point1, point2):
     return brng
 
 def move_along(point1, point2, met_dist):
+    # returns a point in between point1 and point 2, met_distance from point 1
     bearing = get_bearing(point1, point2)
     newloc = distance.distance(meters=met_dist).destination(point1, bearing)
     return newloc
@@ -257,16 +282,18 @@ def move_along(point1, point2, met_dist):
 def customAthleteDecoder(athleteDict):
     return namedtuple('X', athleteDict.keys())(*athleteDict.values())
 
-def get_div(athlete):
-    if (athlete.division == 'MPRO') or (athlete.division == 'FPRO'):
-        return athlete.division
-    birthyear = athlete.birthdate.split('/')[2]
-    thisyear = datetime.date.today().year
+def get_div(division, birthdate, gender):
+    # returns the triathlon division for an athlete
+    # eg MPRO, FPRO, M35-39, F18-24
+    if (division == "MPRO") or (division == "FPRO"):
+        return division
+    birthyear = int(birthdate.split("/")[2])
+    thisyear = int(datetime.date.today().year)
     raceage = thisyear - birthyear
-    if (athlete.gender == 'male'):
+
+    ourdiv = "F"
+    if (gender == 'male'):
         ourdiv = 'M'
-    else:
-        ourdiv = 'F'
     if raceage < 25:
         ourdiv += '18-24'
     elif raceage < 30:
@@ -303,7 +330,7 @@ class RaceAthlete(Athlete):
         outstr += ","
         outstr += self.name
         outstr += ","
-        outstr += get_div(self)
+        outstr += get_div(self.division, self.birthdate, self.gender)
         # Status and finish time
         outstr += ","
         outstr += str(self.status)
@@ -366,6 +393,7 @@ class RaceAthlete(Athlete):
         self.status = 0
         self.starttime = None
         self.leg = 0
+        self.locdatarecord = {}
 
     def start(self):
         self.status = 1
@@ -378,7 +406,7 @@ class RaceAthlete(Athlete):
         race.swimmers += 1
 
         logging.debug("Race Start: " + self.name + " has entered the water! " + str(len(race.athletelist)) + " to go")
-        race.report_data(str(self.racenum), str(time.time()), extraname="RaceStart")
+        race.report_data(str(self.racenum), str(time.time()), priority=True, extraname="-RaceStart")
 
     def set_racenum(self, racenum):
         self.racenum = racenum
@@ -390,7 +418,7 @@ class RaceAthlete(Athlete):
         logging.debug("Run Start: " + self.name + " has entered the bike course!")
         race.t2ers -= 1
         race.runners += 1
-        race.report_data(str(self.racenum), str(time.time()), extraname="RunStart")
+        race.report_data(str(self.racenum), str(time.time()), priority=True, extraname="-RunStart")
 
     def start_bike(self):
         self.status=3
@@ -399,7 +427,7 @@ class RaceAthlete(Athlete):
         logging.debug("Bike Start: " + self.name + " has entered the bike course!")
         race.t1ers -=1
         race.bikers += 1
-        race.report_data(str(self.racenum), str(time.time()), extraname="BikeStart")
+        race.report_data(str(self.racenum), str(time.time()), priority=True, extraname="-BikeStart")
 
     def finish(self, addtime):
         self.status = 10
@@ -411,7 +439,7 @@ class RaceAthlete(Athlete):
                                                       self.t1sec + self.t2sec))))
         race.runners -= 1
         race.finishers += 1
-        race.report_data(str(self.racenum), str(time.time()), extraname="RaceFinish")
+        race.report_data(str(self.racenum), str(time.time()), priority=True, extraname="-RaceFinish")
 
 
     def transition_One(self, addtime):
@@ -422,7 +450,7 @@ class RaceAthlete(Athlete):
         logging.debug("Swim Finish: " + self.name + " is out of the water! "+str(self.swimsec // 60) + ":"+str(self.swimsec % 60) + " -- swim str = " + str(self.swimstr))
         race.swimmers -= 1
         race.t1ers +=1
-        race.report_data(str(self.racenum), str(time.time()), extraname="EnterT1")
+        race.report_data(str(self.racenum), str(time.time()), priority=True, extraname="-EnterT1")
 
     def transition_Two(self, addtime):
         self.status = 4
@@ -433,19 +461,25 @@ class RaceAthlete(Athlete):
             self.bikesec % 60) + " -- bike str = " + str(self.bikestr))
         race.bikers -= 1
         race.t2ers += 1
-        race.report_data(str(self.racenum), str(time.time()), extraname="EnterT2")
+        race.report_data(str(self.racenum), str(time.time()), priority=True, extraname="-EnterT2")
 
     def DNF(self, reason):
         self.status=99
         logging.info(reason)
-        race.report_data(str(self.racenum), str(time.time()), extraname="DNF")
+        race.report_data(str(self.racenum), str(time.time()), priority=True, extraname="-DNF")
         race.dnfers += 1
 
     def report_location(self):
         key = urllib.parse.quote_plus(self.deviceid) + str(device_count[self.deviceid])
         device_count[self.deviceid] = device_count[self.deviceid]+1
         data = {"dev": self.deviceid, "time":str(time.time()), "la":str(self.location[0]), "lo":str(self.location[1]), "nl":"[]"}
-        race.report_data(key, data, priority=False, extraname="locations")
+
+
+        self.locdatarecord[key]=data
+        if (len(self.locdatarecord)>1) and ((race.qsize<100) or (random.randint(1,20)==20)):
+            race.report_data("multipart", self.locdatarecord, priority=False, extraname="-locations")
+            self.locdatarecord={}
+
 
     def advance(self, cycletime):
 
@@ -482,7 +516,7 @@ class RaceAthlete(Athlete):
                     if (self.leg in race.runtm):
                         # Crossed a timing mat, report it
                         myindex = race.runtm.index(self.leg) + 1
-                        race.report_data(str(self.racenum), str(time.time()), extraname="RunTM" + str(myindex))
+                        race.report_data(str(self.racenum), str(time.time()), priority = True, extraname="-RunTM" + str(myindex))
 
                     if (self.leg==len(race.runcrs) -1):
                         rundone = True
@@ -541,7 +575,7 @@ class RaceAthlete(Athlete):
                     if (self.leg in race.biketm):
                         # Crossed a timing mat, report it
                         myindex = race.biketm.index(self.leg) + 1
-                        race.report_data(str(self.racenum), str(time.time()), extraname="BikeTM" + str(myindex))
+                        race.report_data(str(self.racenum), str(time.time()), priority=True, extraname="-BikeTM" + str(myindex))
 
                     if (self.leg==len(race.bikecrs) -1):
                         bikedone = True
@@ -633,6 +667,7 @@ class RaceAthlete(Athlete):
 
 class Race:
     def __init__(self):
+        self.qsize=0
         self.swimmers = 0
         self.bikers = 0
         self.runners=0
@@ -2517,6 +2552,8 @@ class Race:
         ldg = LocationDataGateway()
         count = 1
         racelist = ldg.get_all_data("racelist")
+
+
         racenums = []
         for r in racelist:
             radd=r["data"]
@@ -2527,10 +2564,7 @@ class Race:
 
         self.raceid = self.raceid + "-" + str(count)
 
-
-#TODD
-
-        self.report_data(self.raceid, {"data": self.raceid}, colname="racelist")
+        self.report_data(str(len(racelist)+1), {"data": self.raceid}, colname="racelist")
 
 
         try:
@@ -2558,6 +2592,8 @@ class Race:
                 "colname": colname}
         self.datareporter.report(item, priority)
 
+    def setqsize(self):
+        self.qsize = self.datareporter.queuesize()
     def add_athletes(self, athletes):
         self.athletelist = athletes
         racenumlist = {}
@@ -2572,7 +2608,7 @@ class Race:
     def start_race(self):
         self.starttime = time.time()
         self.isdone = False
-        logging.info("Starting race at " + str(self.starttime), "  windfactor=" + str(self.windfactor) +
+        logging.info("Starting race at " + str(self.starttime) + "  windfactor=" + str(self.windfactor) +
                      "  heatfactor=" + str(self.heatfactor))
         self.racinglist = []
         self.finishedlist = []
@@ -2685,6 +2721,7 @@ if __name__ == '__main__':
     cycletime = int(os.environ.get("CYCLE_TIME"))
 
     race.startinterval = int(os.getenv("START_INTERVAL", 6))
+    SPEEDFACTOR = int(os.getenv("SPEED_FACTOR", SPEEDFACTOR))
 
     logging.info('Loading athletes')
     race.add_athletes(load_athletes(race.athletecount, race.promcount, race.profcount))
@@ -2706,24 +2743,38 @@ if __name__ == '__main__':
     while (race.started == 0): time.sleep(0.1)
 
     while not race.is_done():
+        update_start = time.time()
         race.update_status(cycletime)
+        race.setqsize()
+
+
+
         rtime += cycletime
         race.update_rtime(rtime)
 
         cycles+=1
         if (cycles % 10 == 0):
+
             logging.info("" +str(datetime.timedelta(seconds=rtime)) + " --- " +
                          "  Swimmers: " + str(race.swimmers) + "  |  T1: "+str(race.t1ers) +
                          "  |  Bike: " + str(race.bikers) + "  |  T2: " + str(race.t2ers) +
                          "  |  Run: " + str(race.runners) + "  |  Finished: " + str(race.finishers) +
-                         "  |  DNF: " + str(race.dnfers))
+                         "  |  DNF: " + str(race.dnfers) + " Queue Size:" + str(race.qsize))
         if (cycles == 60):
             if (SHOWPLT):
                 show_map()
             cycles=0
 
         if (SPEEDFACTOR!=9999):
-            time.sleep(cycletime / SPEEDFACTOR)
+            keepwaiting = True
+            while (keepwaiting==True):
+                update_time = time.time() - update_start
+                if (update_time < (cycletime / SPEEDFACTOR)):
+                    time.sleep(0.1)
+                else:
+                    keepwaiting = False
+
+
 
     logging.info("Writing race results to data/raceresults.csv")
 
