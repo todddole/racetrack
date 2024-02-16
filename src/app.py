@@ -13,15 +13,22 @@
 # V1.1 Search Results Improvement
 #   Added Start Time, Swim Time, T1, Bike, Run, Finish Time
 #   Added Status
+#
+# V1.2 ClockTimes Refactor
+#   Added ClockTimes data gateway for Timing Mat Times
+
 
 
 from flask import Flask, request, url_for, render_template
 from src.components.LocationDataGateway import LocationDataGateway
+from src.components.ClockTimes import ClockTimes
 import json
 import time
 import datetime
 
+
 app = Flask(__name__)
+clocktimes = None
 
 def get_header():
     ldg = LocationDataGateway()
@@ -95,7 +102,10 @@ def massage(mylist):
     return retdict
 @app.route("/")
 def main():
+    global clocktimes
     ldg, raceinfo, rname = get_header()
+    if clocktimes is None: clocktimes = ClockTimes(rname)
+    if (rname!=clocktimes.rname) : clocktimes = ClockTimes(rname)
 
 
     returnstr = '''
@@ -158,7 +168,11 @@ def main():
 
 @app.route("/status", methods=['POST'])
 def status():
+    global clocktimes
+
     ldg, raceinfo, rname = get_header()
+    if clocktimes is None: clocktimes = ClockTimes(rname)
+    if (rname!=clocktimes.rname) : clocktimes = ClockTimes(rname)
 
     name = request.form.get('name')
     division = request.form.get('agegroup')
@@ -184,13 +198,7 @@ def status():
     racenumbers = racenumbers[0]["data"]
 
     athletes = ldg.get_all_data("athletes")
-    racestart = massage(ldg.get_all_data(rname + "-RaceStart"))
-    entert1 = massage(ldg.get_all_data(rname + "-EnterT1"))
-    bikestart = massage(ldg.get_all_data(rname + "-BikeStart"))
-    entert2 = massage(ldg.get_all_data(rname + "-EnterT2"))
-    runstart = massage(ldg.get_all_data(rname + "-RunStart"))
-    racefinish = massage(ldg.get_all_data(rname + "-RaceFinish"))
-    DNF = massage(ldg.get_all_data(rname + "-DNF"))
+
 
     returnstr += '''<Table border=1 padding=10px><tr><th>Race Number</th><th>Name</th><th>division</th><th>Status</th>
             <th>Start Time</th><th>Swim</th><th>T1</th><th>Bike</th><th>T2</th><th>Run</th><th>Finish</th>
@@ -215,50 +223,56 @@ def status():
         returnstr += ""+athlete["name"] + "</td><td>"+mydivision+"</td>\n"
 
         status = ""
-        if (key in DNF): status = "Did Not Finish"
-        elif (key in racefinish): status = "Finished"
-        elif (key in racestart): status = "Racing"
+        if clocktimes.get_value(key, "DNF")!= "": status = "Did Not Finish"
+        elif clocktimes.get_value(key, "RaceFinish") != "": status = "Finished"
+        elif clocktimes.get_value(key, "RaceStart") != "": status = "Racing"
         returnstr+="<td>" + status + "</td>\n"
 
         # Race Start
         time_str=""
-        if (key in racestart): time_str = datetime.datetime.fromtimestamp(float(racestart[key])).strftime("%H:%M:%S")
+        rs = clocktimes.get_value(key, "RaceStart")
+        if (rs!=""): time_str = datetime.datetime.fromtimestamp(float(rs)).strftime("%H:%M:%S")
         returnstr += "<td>" + time_str
         returnstr += "</td>\n"
 
         #Swim Time
         time_str = ""
-        if (key in entert1): time_str = str(datetime.timedelta(seconds=int(float(entert1[key]) - float(racestart[key]))))
+        t1 = clocktimes.get_value(key, "EnterT1")
+        if (t1!="") and (rs!=""): time_str = str(datetime.timedelta(seconds=int(float(t1) - float(rs))))
         returnstr += "<td> " + time_str
         returnstr += "</td>\n"
 
         #T1 Time
         time_str = ""
-        if (key in bikestart): time_str = str(datetime.timedelta(seconds=int(float(bikestart[key]) - float(entert1[key]))))
+        bs = clocktimes.get_value(key, "BikeStart")
+        if (bs!="") and (t1!=""): time_str = str(datetime.timedelta(seconds=int(float(bs) - float(t1))))
         returnstr += "<td> " + time_str
         returnstr += "</td>\n"
 
         #Bike Time
         time_str = ""
-        if (key in entert2): time_str = str(datetime.timedelta(seconds=int(float(entert2[key]) - float(bikestart[key]))))
+        t2 = clocktimes.get_value(key, "EnterT2")
+        if (t2!="")and (bs!=""): time_str = str(datetime.timedelta(seconds=int(float(t2) - float(bs))))
         returnstr += "<td> " + time_str
         returnstr += "</td>\n"
 
         #T2 Time
         time_str = ""
-        if (key in runstart): time_str = str(datetime.timedelta(seconds=int(float(runstart[key]) - float(entert2[key]))))
+        rns = clocktimes.get_value(key, "RunStart")
+        if (rns!="") and (t2!=""): time_str = str(datetime.timedelta(seconds=int(float(rns) - float(t2))))
         returnstr += "<td> " + time_str
         returnstr += "</td>\n"
 
         #Run Time
         time_str = ""
-        if (key in racefinish): time_str = str(datetime.timedelta(seconds=int(float(racefinish[key]) - float(runstart[key]))))
+        fin = clocktimes.get_value(key, "RaceFinish")
+        if (fin!="") and (rns!=""): time_str = str(datetime.timedelta(seconds=int(float(fin) - float(rns))))
         returnstr += "<td> " + time_str
         returnstr += "</td>\n"
 
         # Total
         time_str = ""
-        if (key in racefinish): time_str = str(datetime.timedelta(seconds=int(float(racefinish[key]) - float(racestart[key]))))
+        if (fin!="") and (rs!=""): time_str = str(datetime.timedelta(seconds=int(float(fin) - float(rs))))
         returnstr += "<td> " + time_str
         returnstr += "</td>\n"
 
@@ -269,4 +283,9 @@ def status():
     return returnstr
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    app.run(debug=False, port=5001)
+    ldg, raceinfo, rname = get_header()
+    if clocktimes is None: clocktimes = ClockTimes(rname)
+    if (rname!=clocktimes.rname) : clocktimes = ClockTimes(rname)
+    print("Accepting Connections...")
+
