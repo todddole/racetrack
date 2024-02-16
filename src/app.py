@@ -3,8 +3,7 @@
 # V 0.1 gets race list and displays most recent race and start list
 
 from flask import Flask, request, url_for, render_template
-from markupsafe import escape
-from components.LocationDataGateway import LocationDataGateway
+from src.components.LocationDataGateway import LocationDataGateway
 import json
 
 app = Flask(__name__)
