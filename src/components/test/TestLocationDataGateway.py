@@ -35,12 +35,25 @@ class TestLocationDataGateway(unittest.TestCase):
         value = lDG.get_data(expected_id, "test")
         assert value == data
 
+    def test_get_all_data1(self):
+        self.test_add_data1()
+        lDG = LocationDataGateway()
+
+        value = len(lDG.get_all_data("test"))
+        assert value == 1
     def test_del_data1(self):
         self.test_add_data1()
         lDG = LocationDataGateway()
         expected_id="test1234"
         retval = lDG.del_data(expected_id, "test")
         assert retval == 1
+
+    def test_drop_collection(self):
+        lDG = LocationDataGateway()
+        lDG.add_data("1","test1234", "test1234")
+        a=lDG.drop_collection("test1234")
+
+
 
 
 if __name__ == '__main__':

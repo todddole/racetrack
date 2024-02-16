@@ -44,4 +44,21 @@ class LocationDataGateway:
         except Exception as e:
             return None
 
+    def get_all_data(self, collection_name):
+        try:
+            dbcollection = self.db[collection_name]
+            return list(dbcollection.find())
+        except Exception as e:
+            return None
+
+
+    def drop_collection(self, collection_name:str):
+        try:
+            dbcollection = self.db[collection_name]
+            a = dbcollection.drop()
+            print(a)
+            return dbcollection.drop()
+        except Exception as e:
+            print("error")
+            return None
 

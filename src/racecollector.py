@@ -4,42 +4,59 @@
 
 # V1.0 February 1
 # V1.1 February 10: Updated add_data call to include collection name (colname)
+# V1.2 February 15:
+#    Rewrote to use new /data endpoint
+
 
 from flask import Flask, request, Response
 from flask_restful import Resource, Api
 from components.LocationDataGateway import LocationDataGateway
+import os
+import json
+
 
 
 app = Flask(__name__)
-api = Api(app)
+#api = Api(app)
+API_KEY = ""
+DEFAULT_API_KEY = "youareanironman"
 
-class PostLocData(Resource):
-    def get(self):
-        return {'hello': 'world'}
+@app.route('/data', methods=['GET'])
+def get_data():
+    return Response("Hello World!", status=200)
+@app.route('/data/<string:data_key>/', methods=['POST'])
+def put_data(data_key:str):
+    # add a document to mongodb
+    putdata = json.loads(request.data)
+    data = putdata['data']
+    colname = putdata['colname']
+    api_key = putdata['api-key']
 
-    def put(self, segment_id):
-        # add a document to mongodb
-
-        data = request.form['data']
-        colname = request.form['colname']
-        # Add to DB
-        #print("" + segment_id + " - " + data)
-        try:
-            ldg = LocationDataGateway()
-
-            x=ldg.add_data(segment_id, data, colname)
-        except Exception as e:
-            x=0
-
-        if (x==segment_id):
-            response = Response(status=201)
-        else:
-            response = Response(status=500)
+    if (api_key != API_KEY):
+        response = Response(status=401)
         return response
+
+    # Request is authorized.  Add to DB
+
+    try:
+        ldg = LocationDataGateway()
+
+        x=ldg.add_data(data_key, data, colname)
+    except Exception as e:
+        x=0
+
+    if (x==data_key):
+        response = Response(status=201)
+    else:
+        response = Response(status=500)
+    return response
 
 	
 
-api.add_resource(PostLocData, '/<string:segment_id>')
+#api.add_resource(PostLocData, '/<string:segment_id>')
+
+
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    API_KEY = os.getenv("API_KEY", DEFAULT_API_KEY)
+    app.run(debug=True, port=5000)
