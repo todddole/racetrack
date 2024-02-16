@@ -9,6 +9,10 @@
 #       Athlete Name
 #    or Age Group
 #   Search Results include Race Number, Name, Division
+#
+# V1.1 Search Results Improvement
+#   Added Start Time, Swim Time, T1, Bike, Run, Finish Time
+#   Added Status
 
 
 from flask import Flask, request, url_for, render_template
@@ -83,6 +87,12 @@ def get_division(division, birthdate, gender):
     else:
         ourdiv += '80+'
     return ourdiv
+
+def massage(mylist):
+    retdict = {}
+    for item in mylist:
+        retdict[item["_id"]] = item["data"]
+    return retdict
 @app.route("/")
 def main():
     ldg, raceinfo, rname = get_header()
@@ -174,9 +184,18 @@ def status():
     racenumbers = racenumbers[0]["data"]
 
     athletes = ldg.get_all_data("athletes")
+    racestart = massage(ldg.get_all_data(rname + "-RaceStart"))
+    entert1 = massage(ldg.get_all_data(rname + "-EnterT1"))
+    bikestart = massage(ldg.get_all_data(rname + "-BikeStart"))
+    entert2 = massage(ldg.get_all_data(rname + "-EnterT2"))
+    runstart = massage(ldg.get_all_data(rname + "-RunStart"))
+    racefinish = massage(ldg.get_all_data(rname + "-RaceFinish"))
+    DNF = massage(ldg.get_all_data(rname + "-DNF"))
 
-    returnstr+="<Table><tr><th>Race Number</th><th>Name</th><th>division</th></tr>\n"
-
+    returnstr += '''<Table border=1 padding=10px><tr><th>Race Number</th><th>Name</th><th>division</th><th>Status</th>
+            <th>Start Time</th><th>Swim</th><th>T1</th><th>Bike</th><th>T2</th><th>Run</th><th>Finish</th>
+            </tr>
+        '''
 
     for key in racenumbers:
         if (type=='racenum') and (str(key)!=str(number)): continue
@@ -189,11 +208,61 @@ def status():
 
         athlete = json.loads(athlete)
 
-        if (type=='racename') and name not in athlete["name"]: continue
+        if (type == 'racename') and name not in athlete["name"]: continue
         mydivision = get_division(athlete["division"] , athlete["birthdate"], athlete["gender"])
-        if (type=='division') and (mydivision != division): continue
+        if (type == 'division') and (mydivision != division): continue
         returnstr += "<tr><td>" + str(key) + "</td><td>"
-        returnstr+=""+athlete["name"] + "</td><td>"+mydivision+"</td></tr>\n"
+        returnstr += ""+athlete["name"] + "</td><td>"+mydivision+"</td>\n"
+
+        status = ""
+        if (key in DNF): status = "Did Not Finish"
+        elif (key in racefinish): status = "Finished"
+        elif (key in racestart): status = "Racing"
+        returnstr+="<td>" + status + "</td>\n"
+
+        # Race Start
+        time_str=""
+        if (key in racestart): time_str = datetime.datetime.fromtimestamp(float(racestart[key])).strftime("%H:%M:%S")
+        returnstr += "<td>" + time_str
+        returnstr += "</td>\n"
+
+        #Swim Time
+        time_str = ""
+        if (key in entert1): time_str = str(datetime.timedelta(seconds=int(float(entert1[key]) - float(racestart[key]))))
+        returnstr += "<td> " + time_str
+        returnstr += "</td>\n"
+
+        #T1 Time
+        time_str = ""
+        if (key in bikestart): time_str = str(datetime.timedelta(seconds=int(float(bikestart[key]) - float(entert1[key]))))
+        returnstr += "<td> " + time_str
+        returnstr += "</td>\n"
+
+        #Bike Time
+        time_str = ""
+        if (key in entert2): time_str = str(datetime.timedelta(seconds=int(float(entert2[key]) - float(bikestart[key]))))
+        returnstr += "<td> " + time_str
+        returnstr += "</td>\n"
+
+        #T2 Time
+        time_str = ""
+        if (key in runstart): time_str = str(datetime.timedelta(seconds=int(float(runstart[key]) - float(entert2[key]))))
+        returnstr += "<td> " + time_str
+        returnstr += "</td>\n"
+
+        #Run Time
+        time_str = ""
+        if (key in racefinish): time_str = str(datetime.timedelta(seconds=int(float(racefinish[key]) - float(runstart[key]))))
+        returnstr += "<td> " + time_str
+        returnstr += "</td>\n"
+
+        # Total
+        time_str = ""
+        if (key in racefinish): time_str = str(datetime.timedelta(seconds=int(float(racefinish[key]) - float(racestart[key]))))
+        returnstr += "<td> " + time_str
+        returnstr += "</td>\n"
+
+        returnstr += "</tr>\n"
 
     returnstr += "</table>\n"
 
