@@ -37,7 +37,7 @@ ANALYZER_CATEGORIES = [
     "BikeTM2",
     "BikeTM3",
     "BikeTM4",
-    "BikeTM5",
+    #"BikeTM5",
     "EnterT2",
     "RunStart",
     "RunTM1",
@@ -1888,20 +1888,25 @@ RUNCRS = [
             (19.6391514, -155.993898)
         ]
 
+PACE_NONE=0
+PACE_SWIM_SPEED=1
+PACE_BIKE_SPEED=2
+PACE_RUN_SPEED=3
+
 TIMING_MATS = {
-    "EnterT1" : ("Swim Course Finish", 0),
-    "BikeStart" : ("Bike Course Start", 0),
-    "BikeTM1" : ("Bike Course Time Mat 1 (40k)", 39937),
-    "BikeTM2" : ("Bike Course Time Mat 2 (80k)", 80436),
-    "BikeTM3" : ("Bike Course Time Mat 3 (Hawii Turnaround)", 103578),
-    "BikeTM4" : ("Bike Course Time Mat 4 (120k)", 120094),
-    #"BikeTM5" : ("Bike Course Time Mat 5", 160007),
-    "EnterT2" : ("Bike Course Finish", 0),
-    "RunStart" : ("Run Course Start", 0),
-    "RunTM1" : ("Run Course Time Mat 1 (10k)", 5665),
-    "RunTM2" : ("Run Course Time Mat 2 (20k)", 11468),
-    "RunTM3" : ("Run Course Time Mat 3 (30k)", 24834),
-    "RunTM4" : ("Run Course Time Mat 4 (40k)", 37208)
+    "EnterT1" : ("Swim Course Finish", 4000, PACE_SWIM_SPEED),
+    "BikeStart" : ("Bike Course Start", 0, PACE_NONE),
+    "BikeTM1" : ("Bike Course Time Mat 1 (40k)", 39937, PACE_BIKE_SPEED),
+    "BikeTM2" : ("Bike Course Time Mat 2 (80k)", 80436, PACE_BIKE_SPEED),
+    "BikeTM3" : ("Bike Course Time Mat 3 (Hawii Turnaround)", 103578, PACE_BIKE_SPEED),
+    "BikeTM4" : ("Bike Course Time Mat 4 (120k)", 120094, PACE_BIKE_SPEED),
+    #"BikeTM5" : ("Bike Course Time Mat 5", 160007, PACE_BIKE_SPEED),
+    "EnterT2" : ("Bike Course Finish", 180000, PACE_BIKE_SPEED),
+    "RunStart" : ("Run Course Start", 0, PACE_NONE),
+    "RunTM1" : ("Run Course Time Mat 1 (10k)", 5665, PACE_RUN_SPEED),
+    "RunTM2" : ("Run Course Time Mat 2 (20k)", 11468, PACE_RUN_SPEED),
+    "RunTM3" : ("Run Course Time Mat 3 (30k)", 24834, PACE_RUN_SPEED),
+    "RunTM4" : ("Run Course Time Mat 4 (40k)", 37208, PACE_RUN_SPEED)
 }
 
 RUN_TIME_MATS = [134, 206, 255, 287]

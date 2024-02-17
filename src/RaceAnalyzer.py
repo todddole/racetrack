@@ -8,6 +8,15 @@
 # Version 1.0
 #   Creates leaderboards for all divisions
 #   Loads the leaderboards into the database
+#
+# Version 1.1
+#   Added speed/pace column to leaderboard
+#
+# Version 1.2
+#   Added RabbitMQ Integration:
+#   Consumes RabbitMQ queue
+#   On message, checks if >2 minutes have passed since last leaderboard refresh,
+#     and if so, refreshes leaderboards
 
 from src.components.LocationDataGateway import LocationDataGateway
 from src.components.ClockTimes import ClockTimes, massage
@@ -18,7 +27,40 @@ import logging
 import sys
 from geopy import distance
 from src.components.constants import *
+import os
+import pika
+from dotenv import load_dotenv
 
+lastupdate = None
+def get_pace(phase, lastphase, curtime, lasttime):
+    if phase not in TIMING_MATS or lastphase not in TIMING_MATS:
+        return ""
+    pacetype = TIMING_MATS[phase][2]
+    if (pacetype==PACE_NONE): return ""
+
+    laptime = float(curtime) - float(lasttime)
+    lapdist = TIMING_MATS[phase][1] - TIMING_MATS[lastphase][1]
+
+
+    if (pacetype == PACE_SWIM_SPEED):
+        secper100 = (laptime/lapdist)*100
+        return str(datetime.timedelta(seconds=secper100)) + " / 100m"
+
+    if (pacetype == PACE_BIKE_SPEED):
+        kph = (lapdist/1000)/(laptime / 3600)
+        mph = kph * 0.621371
+        retstr = "{:.2f}".format(mph)
+        return retstr + " MPH"
+
+    if (pacetype == PACE_RUN_SPEED):
+        min_per_k = (laptime/60) / (lapdist / 1000)
+        min_per_mi = min_per_k / 0.621371
+        sec_per_mi = min_per_mi*60
+
+        return (str(datetime.timedelta(seconds=sec_per_mi))).split(':',1)[1].split(".")[0] + " / mi"
+
+
+    return ""
 
 
 
@@ -139,11 +181,13 @@ class Race:
             logging.info("Leaderboard for " + division + " Race Started")
             return
 
-
+        lastphase = ANALYZER_CATEGORIES[ANALYZER_CATEGORIES.index(phase) -1]
         phasers = self.clocktimes.get_phasers(phase)
+        lastphasers = self.clocktimes.get_phasers(lastphase)
         divphasers = []
         divathletes = []
         times = []
+        timeslast = []
 
 
 
@@ -151,15 +195,18 @@ class Race:
             athid = self.racenumbers[ph]
             athlete=self.athletes[athid]
             athtime = phasers[ph]
+            lasttime = lastphasers[ph]
             if (athlete["division"] == division):
                 divphasers.append(athid)
                 divathletes.append(athlete)
                 times.append(athtime)
+                timeslast.append(lasttime)
 
         for i in range(len(divphasers)-1):
             for j in range(i+1, len(divphasers)):
                 if times[j]<times[i]:
                     times[i], times[j] = times[j], times[i]
+                    timeslast[i], timeslast[j] = timeslast[j], timeslast[i]
                     divphasers[i], divphasers[j] = divphasers[j], divphasers[i]
                     divathletes[i], divathletes[j] = divathletes[j], divathletes[i]
         shownum = min(20, len(times))
@@ -172,17 +219,22 @@ class Race:
         dataarray = []
         zerotime = int(zerotime)
         leadertime = str(datetime.timedelta(seconds=zerotime - self.starttime)) + " Race Time"
-        dataarray.append({"number":divphasers[0], "name":divathletes[0]["name"], "time": leadertime})
-        logging.info("" + divphasers[0] + " " + divathletes[0]["name"] + " - " + leadertime)
+        pace = get_pace(phase, lastphase, times[0], timeslast[0])
+        dataarray.append({"number":divphasers[0], "name":divathletes[0]["name"], "time": leadertime, "pace":pace})
+
+
+        logging.info("" + divphasers[0] + " " + divathletes[0]["name"] + " - " + leadertime + " - " + pace)
         data["1"] = dataarray[0]
 
         for i in range(1, shownum):
             ourtime = float(times[i])
             ourtime = int(ourtime)
-            if (i==1): logging.info("" + divphasers[i] + " " + divathletes[i]["name"] + " - " + times[i] + " +" +str(datetime.timedelta(seconds=ourtime - zerotime)))
-            else: logging.debug("" + divphasers[i] + " " + divathletes[i]["name"] + " - " + times[i] + " +" +str(datetime.timedelta(seconds=ourtime - zerotime)))
+            ourpace = get_pace(phase, lastphase, times[i], timeslast[i])
+            if (i==1): logging.info("" + divphasers[i] + " " + divathletes[i]["name"] + " - " + times[i] + " +" +str(datetime.timedelta(seconds=ourtime - zerotime)) + " - " + ourpace)
+            else: logging.debug("" + divphasers[i] + " " + divathletes[i]["name"] + " - " + times[i] + " +" +str(datetime.timedelta(seconds=ourtime - zerotime))+ " - " + ourpace)
             dataarray.append({"number": divphasers[i], "name": divathletes[i]["name"],
-                              "time": "+" + str(datetime.timedelta(seconds=ourtime - zerotime))})
+                              "time": "+" + str(datetime.timedelta(seconds=ourtime - zerotime)),
+                              "pace":ourpace})
             data[str(i+1)] = dataarray[i]
         x=self.ldg.upsert_data(division, data, self.rname +"-Leaderboards")
 
@@ -190,12 +242,39 @@ class Race:
         for division in ANALYZE_DIVISIONS:
             self.make_leaderboard(division)
 
+def callback(ch, method, properties, body):
+    global lastupdate
+    logging.info("Received" + str(body))
+    curtime = time.time()
+    if (lastupdate is not None) and (curtime - lastupdate < 120): return
+    lastupdate = curtime
+    race.make_leaderboards()
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
+
+    load_dotenv()
+    rmqurl = os.getenv("RABBITMQ_URL", "")
+    rmqque = os.getenv("RABBITMQ_QUEUE", "")
     race = Race()
-    race.make_leaderboards()
+
+
+    try:
+        params=pika.URLParameters(rmqurl)
+        connection = pika.BlockingConnection(params)
+        channel = connection.channel()
+        channel.queue_declare(queue=rmqque)
+        channel.basic_consume(rmqque,
+                              callback,
+                              auto_ack=True)
+
+    except Exception as e:
+        pass
+    channel.start_consuming()
+    connection.close()
+
+
 
 
 

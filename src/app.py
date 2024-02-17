@@ -22,6 +22,12 @@
 #   Added an "ALL" dropdown option
 #   Constants file
 #   Added Leaderboard to front page V1.0
+#
+# V1.4 RabbitMQ Integration
+#   Sends a rabbitmq message for RaceAnalyzer whenever someone gets /
+#   RaceAnalyzer checks if it's been more than 2 minutes since leaderboards were refreshed,
+#   and refreshes them if so
+#   (note that for now, this probably won't reflect on the current get)
 
 
 from flask import Flask, request, url_for, render_template
@@ -32,11 +38,36 @@ import time
 import datetime
 import logging
 from src.components.constants import *
+import pika
+import os
+from dotenv import load_dotenv
+
 
 app = Flask(__name__)
 clocktimes = None
 
+def send_rabbit_mq(message):
+
+    rmqurl = os.getenv("RABBITMQ_URL", "")
+    rmqque = os.getenv("RABBITMQ_QUEUE", "")
+
+    try:
+        params=pika.URLParameters(rmqurl)
+        connection = pika.BlockingConnection(params)
+        channel = connection.channel()
+        channel.queue_declare(queue=rmqque)
+        channel.basic_publish(exchange='',
+                              routing_key=rmqque,
+                              body=message)
+        connection.close()
+    except Exception as e:
+        pass
+
 def get_header():
+    # does a few common page functions:
+    # gets and returns ldg
+    # returns the top of an html page with race name and current race clock
+    # returns current race name (rname) for future data calls
     ldg = LocationDataGateway()
     racelist = ldg.get_all_data("racelist")
     if (len(racelist) == 0):
@@ -102,12 +133,14 @@ def get_division(division, birthdate, gender):
     return ourdiv
 
 def massage(mylist):
+    # utility function that fixes data from LocationDataGateway
     retdict = {}
     for item in mylist:
         retdict[item["_id"]] = item["data"]
     return retdict
 @app.route("/")
 def main():
+    send_rabbit_mq("leaderboard")
     leaderboard = request.args.get('leaderboard', default="MPRO")
     global clocktimes
     ldg, raceinfo, rname = get_header()
@@ -188,8 +221,11 @@ def main():
     returnstr += leaderboard
     lbdata = ldg.get_data(leaderboard, rname+"-Leaderboards")
     lblocation = lbdata["location"]
+    pacetype = PACE_NONE
     if lblocation in TIMING_MATS.keys():
+        pacetype = TIMING_MATS[lblocation][2]
         lblocation = TIMING_MATS[lblocation][0]
+
     returnstr += " at " + lblocation + "</h1>\n"
 
     returnstr += '''
@@ -231,12 +267,17 @@ def main():
     
     '''
 
-    returnstr += "<table><TR><TH>Race Number</TH><TH>Name</TH><TH>Time Behind Leader</TH></TR>\n"
+    returnstr += "<table><TR><TH>Race Number</TH><TH>Name</TH><TH>Time Behind Leader</TH>"
+    if (pacetype!=PACE_NONE): returnstr += "<TH>Speed:</TH>"
+    returnstr += "</TR>\n"
     for i in range(1,21):
         key = str(i)
         if key in lbdata.keys():
             returnstr += "<tr><td>" + str(lbdata[key]["number"]) + "</td><td>" + \
-                str(lbdata[key]["name"]) + "</td><td>" + str(lbdata[key]["time"]) + "</td></tr>\n"
+                str(lbdata[key]["name"]) + "</td><td>" + str(lbdata[key]["time"]) + "</td>"
+            if (pacetype != PACE_NONE): returnstr += "<td>" + str(lbdata[key]["pace"]) +"</td>"
+            returnstr+="</tr>\n"
+
 
     returnstr += "</table>"
 
@@ -366,9 +407,11 @@ def status():
     return returnstr
 
 if __name__ == "__main__":
+    load_dotenv()
     app.run(debug=False, port=5001)
     ldg, raceinfo, rname = get_header()
     if clocktimes is None: clocktimes = ClockTimes(rname)
     if (rname!=clocktimes.rname) : clocktimes = ClockTimes(rname)
     logging.info("Accepting Connections...")
+
 

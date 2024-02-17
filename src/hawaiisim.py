@@ -51,6 +51,9 @@
 #      Bug fix: Corrected windfactor and heatfactor calculations
 #      Added constants file, moved most of the course definitions to constants
 #      Bug fix: priority was getting dropped
+#
+# V1.23
+#   Faster Transitions for pros
 
 
 from components.LocationDataGateway import LocationDataGateway
@@ -466,7 +469,8 @@ class RaceAthlete(Athlete):
         self.status = 2
         self.leg = 0
         self.t1sec = addtime
-        self.t1left = random.randint(90,600) - addtime
+        t1max = 150 if self.division in ["MPRO", "FPRO"] else 600
+        self.t1left = random.randint(90,t1max) - addtime
         logging.debug("Swim Finish: " + self.name + " is out of the water! "+str(self.swimsec // 60) + ":"+str(self.swimsec % 60) + " -- swim str = " + str(self.swimstr))
         race.swimmers -= 1
         race.t1ers +=1
@@ -476,7 +480,8 @@ class RaceAthlete(Athlete):
         self.status = 4
         self.leg = 0
         self.t2sec = addtime
-        self.t2left = random.randint(90, 600) - addtime
+        t2max = 150 if self.division in ["MPRO", "FPRO"] else 600
+        self.t2left = random.randint(90, t2max) - addtime
         logging.debug("Bike Finish: " + self.name + " is off the bike! " + str(self.bikesec // 60) + ":" + str(
             self.bikesec % 60) + " -- bike str = " + str(self.bikestr))
         race.bikers -= 1
