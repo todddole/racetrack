@@ -52,6 +52,7 @@ class ClockTimes:
 
         for i in range(len(TIME_MAT_CATEGORIES)):
             self.timedata[i]=massage(self.ldg.get_all_data(self.rname + "-" + TIME_MAT_CATEGORIES[i]))
+            logging.debug(" init "+TIME_MAT_CATEGORIES[i] + " size "+str(len(self.timedata[i])))
             self.lastupdates[i] = time.time()
 
     def refresh_data(self, index):
@@ -59,7 +60,15 @@ class ClockTimes:
         self.timedata[index] = massage(self.ldg.get_all_data(self.rname + "-" + TIME_MAT_CATEGORIES[index]))
         self.lastupdates[index] = time.time()
 
+    def get_starters(self):
+        self.refresh_data(0)
+        return self.timedata[0]
 
+    def get_phasers(self, phase):
+        if phase not in TIME_MAT_CATEGORIES: return None
+        index = TIME_MAT_CATEGORIES.index(phase)
+        self.refresh_data(index)
+        return self.timedata[index]
 
     def get_value(self, key, category):
         if category not in TIME_MAT_CATEGORIES:
@@ -71,6 +80,8 @@ class ClockTimes:
         if key not in self.timedata[index]:
             return ""
         return self.timedata[index][key]
+
+
 
 
 

@@ -6,7 +6,9 @@
 # V1.1 February 10: Updated add_data call to include collection name (colname)
 # V1.2 February 15:
 #    Rewrote to use new /data endpoint
-
+# V1.3 February 17:
+#    Switched to upsert data, so if part of a multipart fails to update the
+#      first time around, it won't cause problems on the second try
 
 from flask import Flask, request, Response
 from flask_restful import Resource, Api
@@ -47,7 +49,7 @@ def put_data(data_key:str):
             for key in data:
                 value = data[key]
 
-                x = ldg.add_data(key, value, colname)
+                x = ldg.upsert_data(key, value, colname)
                 if (x!=key):
                     print("  Error: x=" + x + " key=" + key + " value=" + value)
                     retstat = 500

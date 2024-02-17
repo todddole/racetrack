@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 import json
 import pymongo
+import logging
 
 class LocationDataGateway:
     def __init__(self):   
@@ -25,6 +26,25 @@ class LocationDataGateway:
     def add_data(self, id, data, collection_name):
         try:
             dbcollection = self.db[collection_name]
+            x=dbcollection.insert_one({"_id": id, "data":data}).inserted_id
+        except Exception as e:
+            return None
+        return x
+
+    def upsert_data(self, id, data, collection_name):
+        try:
+            dbcollection = self.db[collection_name]
+        except Exception as e:
+            return None
+
+        try:
+            x = dbcollection.insert_one({"_id": id, "data": data}).inserted_id
+            if (x is not None): return x
+        except Exception as e:
+            pass
+
+        try:
+            x=dbcollection.delete_one({"_id": id})
             x=dbcollection.insert_one({"_id": id, "data":data}).inserted_id
         except Exception as e:
             return None
@@ -56,7 +76,7 @@ class LocationDataGateway:
         try:
             dbcollection = self.db[collection_name]
             a = dbcollection.drop()
-            print(a)
+            logging.info("Dropped collection " + str(a))
             return dbcollection.drop()
         except Exception as e:
             print("error")

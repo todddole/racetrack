@@ -1,0 +1,250 @@
+INFO:root:Starting HawaiiSim
+INFO:root:Loading athletes
+INFO:root:Loaded 2900 athletes
+INFO:root:Waiting until 1 for the race to start...
+INFO:root:Starting HawaiiSim
+INFO:root:Loading athletes
+INFO:root:Loaded 2900 athletes
+INFO:root:Waiting until 06:40 for the race to start...
+INFO:root:Starting race at 1708173608.6766176  windfactor=0.9082895644830126  heatfactor=0.9199545443331891
+INFO:root:Starting the Pro Men Race!
+INFO:root:0:10:00 ---   Swimmers: 250  |  T1: 0  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 0 Queue Size:0
+INFO:root:  Queue Sizes: (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) 
+INFO:root:Starting the Pro Women Race!
+INFO:root:0:11:00 -- Reynold Goyette was eaten by a shark!!
+INFO:root:0:20:00 ---   Swimmers: 399  |  T1: 0  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 1 Queue Size:125
+INFO:root:  Queue Sizes: (8,0) (9,0) (9,0) (8,0) (9,0) (8,0) (8,0) (8,0) (8,0) (8,0) (8,0) (8,0) (9,0) (8,0) (8,0) 
+INFO:root:Starting the Age Groupers!
+INFO:root:0:30:00 ---   Swimmers: 941  |  T1: 0  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 1 Queue Size:501
+INFO:root:  Queue Sizes: (34,0) (35,0) (34,0) (34,0) (34,0) (34,0) (34,0) (34,0) (34,0) (32,0) (34,0) (32,0) (31,0) (33,0) (32,0) 
+INFO:root:0:32:00 -- Emelia Lind was eaten by a shark!!
+INFO:root:0:39:00 -- Prof. Alfonzo Hudson V was eaten by a shark!!
+INFO:root:0:40:00 ---   Swimmers: 1538  |  T1: 1  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 3 Queue Size:0
+INFO:root:  Queue Sizes: (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) 
+INFO:root:0:43:00 -- Dr. Raphael Schuppe was eaten by a shark!!
+INFO:root:0:46:00 -- Dr. Chanel Konopelski MD was eaten by a shark!!
+INFO:root:0:50:00 ---   Swimmers: 2006  |  T1: 86  |  Bike: 45  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 5 Queue Size:473
+INFO:root:  Queue Sizes: (33,0) (27,0) (30,0) (31,0) (33,0) (34,0) (34,0) (32,0) (29,0) (32,0) (33,0) (34,0) (32,0) (28,0) (31,0) 
+INFO:root:0:56:00 -- Isac Zboncak was eaten by a shark!!
+INFO:root:0:57:00 -- Nelle Metz was eaten by a shark!!
+INFO:root:1:00:00 ---   Swimmers: 2448  |  T1: 96  |  Bike: 191  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 7 Queue Size:796
+INFO:root:  Queue Sizes: (52,0) (52,0) (50,0) (45,0) (45,0) (47,0) (54,0) (56,0) (55,0) (60,0) (63,0) (62,0) (50,0) (53,0) (52,0) 
+INFO:root:1:04:00 -- Asa Romaguera was eaten by a shark!!
+INFO:root:1:10:00 ---   Swimmers: 2511  |  T1: 45  |  Bike: 336  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 8 Queue Size:1994
+INFO:root:  Queue Sizes: (134,0) (133,0) (133,0) (132,0) (133,0) (135,0) (135,0) (133,0) (134,0) (132,0) (131,0) (132,0) (132,0) (133,0) (132,0) 
+INFO:root:1:11:00 -- Ashlynn Abshire was eaten by a shark!!
+INFO:root:1:18:00 -- Ada Mitchell was eaten by a shark!!
+INFO:root:1:18:00 -- Dr. Elian Altenwerth DDS was eaten by a shark!!
+INFO:root:1:19:00 -- Liliane Barrows was eaten by a shark!!
+INFO:root:1:20:00 ---   Swimmers: 2483  |  T1: 11  |  Bike: 394  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 12 Queue Size:2680
+INFO:root:  Queue Sizes: (176,0) (178,0) (179,0) (176,0) (178,0) (181,0) (181,0) (180,0) (183,0) (180,0) (178,0) (180,0) (177,0) (177,0) (176,0) 
+INFO:root:1:26:00 -- Rebekah Koelpin was eaten by a shark!!
+INFO:root:1:26:00 -- Alan Jenkins was eaten by a shark!!
+INFO:root:1:28:00 -- Laurence Kuhic was eaten by a shark!!
+INFO:root:1:30:00 ---   Swimmers: 2447  |  T1: 24  |  Bike: 414  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 15 Queue Size:4143
+INFO:root:  Queue Sizes: (273,0) (274,0) (276,0) (273,0) (276,0) (278,0) (280,0) (278,0) (289,0) (278,0) (273,0) (277,0) (273,0) (273,0) (272,0) 
+INFO:root:1:30:00 -- Richard Huels was eaten by a shark!!
+INFO:root:1:32:00 -- Yasmeen Windler PhD was eaten by a shark!!
+INFO:root:1:33:00 -- Chad Bahringer was eaten by a shark!!
+INFO:root:1:38:00 -- Prof. Elijah Fahey II was eaten by a shark!!
+INFO:root:1:39:00 -- Jonas Fritsch III was eaten by a shark!!
+INFO:root:1:40:00 ---   Swimmers: 2348  |  T1: 67  |  Bike: 465  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 20 Queue Size:6188
+INFO:root:  Queue Sizes: (410,0) (413,0) (413,0) (412,0) (413,0) (413,0) (414,0) (414,0) (416,0) (414,0) (410,0) (415,0) (410,0) (411,0) (410,0) 
+INFO:root:1:40:00 -- Aubrey Bogisich was eaten by a shark!!
+INFO:root:1:49:00 -- Otha Yost was eaten by a shark!!
+INFO:root:1:50:00 ---   Swimmers: 2117  |  T1: 142  |  Bike: 619  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 22 Queue Size:7558
+INFO:root:  Queue Sizes: (498,0) (499,0) (498,0) (498,0) (506,0) (504,0) (514,0) (501,0) (513,0) (513,0) (499,0) (520,0) (498,0) (500,0) (497,0) 
+INFO:root:1:52:00 -- Fanny Breitenberg DDS was eaten by a shark!!
+INFO:root:1:54:00 -- Jada Gutkowski PhD was eaten by a shark!!
+INFO:root:1:57:00 -- Prof. Chesley Harvey DDS was in a brutal accident and has dropped out!!
+INFO:root:1:57:00 -- Landen Hammes MD was eaten by a shark!!
+INFO:root:2:00:00 ---   Swimmers: 1813  |  T1: 190  |  Bike: 871  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 26 Queue Size:9124
+INFO:root:  Queue Sizes: (607,0) (606,0) (605,0) (605,0) (607,0) (607,0) (609,0) (605,0) (608,0) (614,0) (605,0) (624,0) (607,0) (608,0) (606,0) 
+INFO:root:2:00:00 -- Chadd Nienow was eaten by a shark!!
+INFO:root:2:01:00 -- Kyla Hagenes was eaten by a shark!!
+INFO:root:2:08:00 -- Kadin Koelpin was eaten by a shark!!
+INFO:root:2:10:00 ---   Swimmers: 1439  |  T1: 219  |  Bike: 1213  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 29 Queue Size:11723
+INFO:root:  Queue Sizes: (781,0) (781,0) (780,0) (781,0) (782,0) (784,0) (784,0) (781,0) (781,0) (781,0) (767,0) (801,0) (782,0) (781,0) (776,0) 
+INFO:root:2:12:00 -- Estella Bruen was eaten by a shark!!
+INFO:root:2:14:00 -- Miss Mireille Lesch II was eaten by a shark!!
+INFO:root:2:20:00 ---   Swimmers: 1075  |  T1: 205  |  Bike: 1589  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 31 Queue Size:12888
+INFO:root:  Queue Sizes: (859,0) (859,0) (855,0) (858,0) (857,0) (874,0) (868,0) (851,0) (859,0) (855,0) (846,0) (885,0) (855,0) (856,0) (851,0) 
+INFO:root:2:21:00 -- Dr. Cristobal Streich was in a brutal accident and has dropped out!!
+INFO:root:2:23:00 -- Sidney Kertzmann was in a brutal accident and has dropped out!!
+INFO:root:2:30:00 ---   Swimmers: 754  |  T1: 179  |  Bike: 1934  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 33 Queue Size:15563
+INFO:root:  Queue Sizes: (1036,0) (1037,0) (1037,0) (1036,0) (1036,0) (1044,0) (1038,0) (1035,0) (1035,0) (1036,0) (1032,0) (1055,0) (1036,0) (1035,0) (1035,0) 
+INFO:root:2:30:00 -- Kristopher Bosco was in a brutal accident and has dropped out!!
+INFO:root:2:32:00 -- Deontae Willms was eaten by a shark!!
+INFO:root:2:36:00 -- Octavia Daugherty was in a brutal accident and has dropped out!!
+INFO:root:2:37:00 -- Dr. Foster Swift I was in a brutal accident and has dropped out!!
+INFO:root:2:40:00 ---   Swimmers: 505  |  T1: 139  |  Bike: 2219  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 37 Queue Size:17406
+INFO:root:  Queue Sizes: (1160,0) (1161,0) (1160,0) (1162,0) (1153,0) (1179,0) (1169,0) (1149,0) (1153,0) (1158,0) (1144,0) (1188,0) (1154,0) (1154,0) (1162,0) 
+INFO:root:2:45:00 -- Jeremie Volkman was in a brutal accident and has dropped out!!
+INFO:root:2:48:00 -- Mr. Eduardo Quitzon was in a brutal accident and has dropped out!!
+INFO:root:2:50:00 ---   Swimmers: 324  |  T1: 85  |  Bike: 2452  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 39 Queue Size:19020
+INFO:root:  Queue Sizes: (1266,0) (1266,0) (1257,0) (1279,0) (1254,0) (1289,0) (1281,0) (1257,0) (1256,0) (1268,0) (1248,0) (1290,0) (1270,0) (1271,0) (1268,0) 
+INFO:root:2:51:00 -- Leonor Lindgren failed to make the swim cutoff, pulled out of the water!! -- swim str = -8
+INFO:root:2:51:00 -- Claire Senger failed to make the swim cutoff, pulled out of the water!! -- swim str = -13
+INFO:root:2:51:00 -- Matt Bahringer was in a brutal accident and has dropped out!!
+INFO:root:2:52:00 -- Cole Batz was in a brutal accident and has dropped out!!
+INFO:root:2:53:00 -- Trevor Larson failed to make the swim cutoff, pulled out of the water!! -- swim str = -1
+INFO:root:2:53:00 -- Prof. Jaron Kris IV was eaten by a shark!!
+INFO:root:2:53:00 -- Jayden Russel was in a brutal accident and has dropped out!!
+INFO:root:2:54:00 -- Cayla Bogisich failed to make the swim cutoff, pulled out of the water!! -- swim str = -9
+INFO:root:2:55:00 -- Arlo Parker I failed to make the swim cutoff, pulled out of the water!! -- swim str = -1
+INFO:root:2:56:00 -- Simeon Rempel failed to make the swim cutoff, pulled out of the water!! -- swim str = -11
+INFO:root:2:57:00 -- Mossie Hayes failed to make the swim cutoff, pulled out of the water!! -- swim str = -6
+INFO:root:2:57:00 -- Steve Botsford failed to make the swim cutoff, pulled out of the water!! -- swim str = -7
+INFO:root:2:58:00 -- Lavina Cruickshank PhD was in a brutal accident and has dropped out!!
+INFO:root:2:59:00 -- Freda Gottlieb IV failed to make the swim cutoff, pulled out of the water!! -- swim str = 0
+INFO:root:2:59:00 -- Garfield Carter was in a brutal accident and has dropped out!!
+INFO:root:3:00:00 ---   Swimmers: 179  |  T1: 73  |  Bike: 2594  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 54 Queue Size:20461
+INFO:root:  Queue Sizes: (1361,0) (1362,0) (1358,0) (1369,0) (1357,0) (1387,0) (1372,0) (1358,0) (1357,0) (1361,0) (1349,0) (1383,0) (1361,0) (1363,0) (1363,0) 
+INFO:root:3:00:00 -- Prof. Amiya Nicolas failed to make the swim cutoff, pulled out of the water!! -- swim str = -10
+INFO:root:3:01:00 -- Mr. Bennie Schroeder MD failed to make the swim cutoff, pulled out of the water!! -- swim str = -9
+INFO:root:3:01:00 -- Judd Borer failed to make the swim cutoff, pulled out of the water!! -- swim str = -4
+INFO:root:3:02:00 -- Mr. Domenick DuBuque failed to make the swim cutoff, pulled out of the water!! -- swim str = -3
+INFO:root:3:03:00 -- Felton Cummings failed to make the swim cutoff, pulled out of the water!! -- swim str = -13
+INFO:root:3:06:00 -- Wilfrid Von failed to make the swim cutoff, pulled out of the water!! -- swim str = -9
+INFO:root:3:07:00 -- Mr. Miguel Gorczany failed to make the swim cutoff, pulled out of the water!! -- swim str = -13
+INFO:root:3:08:00 -- Evie Feest was in a brutal accident and has dropped out!!
+INFO:root:3:08:00 -- Otilia Bergstrom IV failed to make the swim cutoff, pulled out of the water!! -- swim str = -6
+INFO:root:3:08:00 -- Miss Emilie Mohr failed to make the swim cutoff, pulled out of the water!! -- swim str = -8
+INFO:root:3:08:00 -- Gwendolyn Schaden I failed to make the swim cutoff, pulled out of the water!! -- swim str = -6
+INFO:root:3:08:00 -- Gerson Auer failed to make the swim cutoff, pulled out of the water!! -- swim str = -6
+INFO:root:3:09:00 -- Margret Barrows DDS was in a brutal accident and has dropped out!!
+INFO:root:3:10:00 ---   Swimmers: 89  |  T1: 40  |  Bike: 2704  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 67 Queue Size:22294
+INFO:root:  Queue Sizes: (1482,0) (1489,0) (1482,0) (1496,0) (1485,0) (1517,0) (1499,0) (1482,0) (1474,0) (1480,0) (1451,0) (1496,0) (1486,0) (1487,0) (1488,0) 
+INFO:root:3:10:00 -- Yasmeen Schulist V failed to make the swim cutoff, pulled out of the water!! -- swim str = -1
+INFO:root:3:10:00 -- Mr. Ricky Bernier DDS failed to make the swim cutoff, pulled out of the water!! -- swim str = -6
+INFO:root:3:11:00 -- Raquel King PhD failed to make the swim cutoff, pulled out of the water!! -- swim str = -10
+INFO:root:3:11:00 -- Mr. Moriah Stiedemann MD failed to make the swim cutoff, pulled out of the water!! -- swim str = -20
+INFO:root:3:11:00 -- Reymundo Rutherford failed to make the swim cutoff, pulled out of the water!! -- swim str = -13
+INFO:root:3:12:00 -- Gina Kreiger failed to make the swim cutoff, pulled out of the water!! -- swim str = -4
+INFO:root:3:13:00 -- Gladys Kunde failed to make the swim cutoff, pulled out of the water!! -- swim str = -8
+INFO:root:3:13:00 -- Prof. Crawford Kovacek failed to make the swim cutoff, pulled out of the water!! -- swim str = -1
+INFO:root:3:13:00 -- Desmond Gleichner failed to make the swim cutoff, pulled out of the water!! -- swim str = -15
+INFO:root:3:13:00 -- Johanna Reinger failed to make the swim cutoff, pulled out of the water!! -- swim str = -9
+INFO:root:3:14:00 -- Laurine Kunze MD failed to make the swim cutoff, pulled out of the water!! -- swim str = -4
+INFO:root:3:15:00 -- Rodrigo Doyle failed to make the swim cutoff, pulled out of the water!! -- swim str = -10
+INFO:root:3:16:00 -- Kim Gusikowski failed to make the swim cutoff, pulled out of the water!! -- swim str = 1
+INFO:root:3:16:00 -- Gina Reichert failed to make the swim cutoff, pulled out of the water!! -- swim str = -7
+INFO:root:3:16:00 -- Mr. Santos Daniel I failed to make the swim cutoff, pulled out of the water!! -- swim str = -5
+INFO:root:3:16:00 -- Prof. Freeman Bayer DVM was in a brutal accident and has dropped out!!
+INFO:root:3:16:00 -- Prof. Norval Hettinger was in a brutal accident and has dropped out!!
+INFO:root:3:17:00 -- Carson Rippin was in a brutal accident and has dropped out!!
+INFO:root:3:18:00 -- Marshall Ullrich MD was in a brutal accident and has dropped out!!
+INFO:root:3:18:00 -- Dr. Tremayne Braun failed to make the swim cutoff, pulled out of the water!! -- swim str = -2
+INFO:root:3:18:00 -- Zion Rice failed to make the swim cutoff, pulled out of the water!! -- swim str = -9
+INFO:root:3:20:00 ---   Swimmers: 38  |  T1: 16  |  Bike: 2758  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 88 Queue Size:22901
+INFO:root:  Queue Sizes: (1522,0) (1535,0) (1517,0) (1540,0) (1521,0) (1545,0) (1540,0) (1525,0) (1517,0) (1518,0) (1492,0) (1537,0) (1529,0) (1531,0) (1532,0) 
+INFO:root:3:20:00 -- Dino Barrows Jr. failed to make the swim cutoff, pulled out of the water!! -- swim str = -3
+INFO:root:3:20:00 -- Dusty Schultz failed to make the swim cutoff, pulled out of the water!! -- swim str = -10
+INFO:root:3:23:00 -- Prof. Ray Steuber PhD failed to make the swim cutoff, pulled out of the water!! -- swim str = -6
+INFO:root:3:23:00 -- Mr. Luther Torp PhD failed to make the swim cutoff, pulled out of the water!! -- swim str = -7
+INFO:root:3:24:00 -- Wendell Donnelly failed to make the swim cutoff, pulled out of the water!! -- swim str = -7
+INFO:root:3:24:00 -- Mrs. Jannie Waelchi PhD failed to make the swim cutoff, pulled out of the water!! -- swim str = -7
+INFO:root:3:24:00 -- Dolores Doyle failed to make the swim cutoff, pulled out of the water!! -- swim str = -5
+INFO:root:3:26:00 -- Mr. Garfield Stoltenberg V was in a brutal accident and has dropped out!!
+INFO:root:3:26:00 -- Dr. Earnestine White IV failed to make the swim cutoff, pulled out of the water!! -- swim str = -7
+INFO:root:3:26:00 -- Malvina Schaden failed to make the swim cutoff, pulled out of the water!! -- swim str = -10
+INFO:root:3:27:00 -- Jerry Kihn failed to make the swim cutoff, pulled out of the water!! -- swim str = -6
+INFO:root:3:28:00 -- Dr. Odessa Miller Jr. failed to make the swim cutoff, pulled out of the water!! -- swim str = -4
+INFO:root:3:28:00 -- Yasmin Sauer failed to make the swim cutoff, pulled out of the water!! -- swim str = 0
+INFO:root:3:29:00 -- Mrs. Ericka Brown failed to make the swim cutoff, pulled out of the water!! -- swim str = -4
+INFO:root:3:30:00 ---   Swimmers: 4  |  T1: 9  |  Bike: 2785  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 102 Queue Size:24459
+INFO:root:  Queue Sizes: (1624,0) (1628,0) (1621,0) (1633,0) (1621,0) (1655,0) (1656,0) (1627,0) (1622,0) (1625,0) (1611,0) (1644,0) (1627,0) (1628,0) (1637,0) 
+INFO:root:3:30:00 -- Dr. Moises Stamm II was in a brutal accident and has dropped out!!
+INFO:root:3:30:00 -- Dejuan Kling failed to make the swim cutoff, pulled out of the water!! -- swim str = -4
+INFO:root:3:30:00 -- Wilburn Mosciski failed to make the swim cutoff, pulled out of the water!! -- swim str = -1
+INFO:root:3:32:00 -- Dr. Jimmy Hahn failed to make the swim cutoff, pulled out of the water!! -- swim str = -14
+INFO:root:3:32:00 -- Dr. Milford Walter failed to make the swim cutoff, pulled out of the water!! -- swim str = -7
+INFO:root:3:36:00 -- Roman Shields was in a brutal accident and has dropped out!!
+INFO:root:3:40:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2792  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 108 Queue Size:25994
+INFO:root:  Queue Sizes: (1731,0) (1735,0) (1732,0) (1735,0) (1726,0) (1750,0) (1757,0) (1735,0) (1733,0) (1732,0) (1700,0) (1735,0) (1721,0) (1733,0) (1739,0) 
+INFO:root:3:41:00 -- Abdullah Wilkinson was in a brutal accident and has dropped out!!
+INFO:root:3:42:00 -- Miss Bethel Bayer was in a brutal accident and has dropped out!!
+INFO:root:3:50:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2790  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 110 Queue Size:27060
+INFO:root:  Queue Sizes: (1801,0) (1808,0) (1800,0) (1805,0) (1791,0) (1817,0) (1827,0) (1808,0) (1799,0) (1807,0) (1780,0) (1803,0) (1794,0) (1808,0) (1812,0) 
+INFO:root:3:53:00 -- Caleb Weimann Jr. was in a brutal accident and has dropped out!!
+INFO:root:3:56:00 -- Rico Kemmer was in a brutal accident and has dropped out!!
+INFO:root:4:00:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2788  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 112 Queue Size:28543
+INFO:root:  Queue Sizes: (1900,0) (1898,0) (1894,0) (1897,0) (1895,0) (1919,0) (1931,0) (1901,0) (1900,0) (1903,0) (1892,0) (1901,0) (1896,0) (1904,0) (1912,0) 
+INFO:root:4:01:00 -- Jared Sawayn was in a brutal accident and has dropped out!!
+INFO:root:4:02:00 -- Breanna Thompson was in a brutal accident and has dropped out!!
+INFO:root:4:06:00 -- Prof. Raymundo Quigley was in a brutal accident and has dropped out!!
+INFO:root:4:08:00 -- Webster Pagac PhD was in a brutal accident and has dropped out!!
+INFO:root:4:10:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2784  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 116 Queue Size:30144
+INFO:root:  Queue Sizes: (2004,0) (2002,0) (1992,0) (2000,0) (1997,0) (2028,0) (2041,0) (2006,0) (2006,0) (2014,0) (1993,0) (2006,0) (2004,0) (2023,0) (2028,0) 
+INFO:root:4:10:00 -- Agustin Ebert IV was in a brutal accident and has dropped out!!
+INFO:root:4:12:00 -- Miss Susana Jakubowski was in a brutal accident and has dropped out!!
+INFO:root:4:20:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2782  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 118 Queue Size:31037
+INFO:root:  Queue Sizes: (2069,0) (2070,0) (2046,0) (2051,0) (2048,0) (2081,0) (2094,0) (2071,0) (2075,0) (2080,0) (2051,0) (2070,0) (2069,0) (2080,0) (2082,0) 
+INFO:root:4:20:00 -- Leora Satterfield was in a brutal accident and has dropped out!!
+INFO:root:4:25:00 -- Edwina Armstrong was in a brutal accident and has dropped out!!
+INFO:root:4:30:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2780  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 120 Queue Size:32700
+INFO:root:  Queue Sizes: (2173,0) (2177,0) (2165,0) (2166,0) (2166,0) (2196,0) (2203,0) (2179,0) (2183,0) (2191,0) (2168,0) (2178,0) (2174,0) (2186,0) (2195,0) 
+INFO:root:4:31:00 -- Heidi O'Keefe IV was in a brutal accident and has dropped out!!
+INFO:root:4:31:00 -- Brad Dickinson DVM was in a brutal accident and has dropped out!!
+INFO:root:4:32:00 -- Dane Mayer IV was in a brutal accident and has dropped out!!
+INFO:root:4:33:00 -- Mrs. Tara Tremblay was in a brutal accident and has dropped out!!
+INFO:root:4:34:00 -- Alene Jenkins was in a brutal accident and has dropped out!!
+INFO:root:4:40:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2775  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 125 Queue Size:34009
+INFO:root:  Queue Sizes: (2264,0) (2269,0) (2249,0) (2249,0) (2251,0) (2277,0) (2286,0) (2266,0) (2275,0) (2283,0) (2255,0) (2269,0) (2262,0) (2270,0) (2284,0) 
+INFO:root:4:42:00 -- Tyson Nikolaus was in a brutal accident and has dropped out!!
+INFO:root:4:45:00 -- Joelle Graham was in a brutal accident and has dropped out!!
+INFO:root:4:50:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2760  |  T2: 9  |  Run: 4  |  Finished: 0  |  DNF: 127 Queue Size:35002
+INFO:root:  Queue Sizes: (2327,0) (2327,0) (2312,0) (2310,0) (2317,0) (2335,0) (2355,0) (2328,0) (2345,0) (2354,0) (2325,0) (2342,0) (2338,0) (2335,0) (2352,0) 
+INFO:root:4:50:00 -- Maria Feil was in a brutal accident and has dropped out!!
+INFO:root:4:52:00 -- Cooper Okuneva was in a brutal accident and has dropped out!!
+INFO:root:4:55:00 -- Mr. Daren Reilly MD was in a brutal accident and has dropped out!!
+INFO:root:5:00:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2714  |  T2: 27  |  Run: 29  |  Finished: 0  |  DNF: 130 Queue Size:36875
+INFO:root:  Queue Sizes: (2462,0) (2458,0) (2431,0) (2429,0) (2431,0) (2465,0) (2469,0) (2462,0) (2466,0) (2475,0) (2461,0) (2468,0) (2466,0) (2463,0) (2469,0) 
+INFO:root:5:00:00 -- Prof. Nichole Pouros was in a brutal accident and has dropped out!!
+INFO:root:5:02:00 -- Greyson Krajcik was in a brutal accident and has dropped out!!
+INFO:root:5:10:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2643  |  T2: 42  |  Run: 83  |  Finished: 0  |  DNF: 132 Queue Size:37845
+INFO:root:  Queue Sizes: (2524,0) (2522,0) (2499,0) (2500,0) (2501,0) (2527,0) (2538,0) (2523,0) (2530,0) (2540,0) (2516,0) (2531,0) (2530,0) (2526,0) (2538,0) 
+INFO:root:5:12:00 -- Dr. Dante Reilly was in a brutal accident and has dropped out!!
+INFO:root:5:12:00 -- Marcel Batz was in a brutal accident and has dropped out!!
+INFO:root:5:14:00 -- Dr. Tremaine Roberts was in a brutal accident and has dropped out!!
+INFO:root:5:15:00 -- Maya Torp was in a brutal accident and has dropped out!!
+INFO:root:5:20:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2580  |  T2: 37  |  Run: 147  |  Finished: 0  |  DNF: 136 Queue Size:39341
+INFO:root:  Queue Sizes: (2627,0) (2618,0) (2595,0) (2597,0) (2599,0) (2631,0) (2634,0) (2626,0) (2629,0) (2638,0) (2624,0) (2629,0) (2630,0) (2629,0) (2635,0) 
+INFO:root:5:24:00 -- Edward Blanda has bonked and decided to throw in the towel!!
+INFO:root:5:25:00 -- Rodger Nolan has bonked and decided to throw in the towel!!
+INFO:root:5:28:00 -- Paolo Nader has bonked and decided to throw in the towel!!
+INFO:root:5:28:00 -- Ludie Walsh III was in a brutal accident and has dropped out!!
+INFO:root:5:30:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2524  |  T2: 37  |  Run: 199  |  Finished: 0  |  DNF: 140 Queue Size:41099
+INFO:root:  Queue Sizes: (2740,0) (2732,0) (2714,0) (2723,0) (2723,0) (2755,0) (2758,0) (2732,0) (2748,0) (2760,0) (2728,0) (2745,0) (2741,0) (2742,0) (2758,0) 
+INFO:root:5:33:00 -- Ms. Kirsten Jacobson III was in a brutal accident and has dropped out!!
+INFO:root:5:35:00 -- Dr. Kennedi Schowalter was in a brutal accident and has dropped out!!
+INFO:root:5:36:00 -- Prof. Omer Cole was in a brutal accident and has dropped out!!
+INFO:root:5:39:00 -- Cheyanne Rempel was in a brutal accident and has dropped out!!
+INFO:root:5:40:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2468  |  T2: 34  |  Run: 254  |  Finished: 0  |  DNF: 144 Queue Size:42305
+INFO:root:  Queue Sizes: (2825,0) (2821,0) (2794,0) (2805,0) (2794,0) (2831,0) (2837,0) (2824,0) (2826,0) (2847,0) (2815,0) (2822,0) (2813,0) (2821,0) (2830,0) 
+INFO:root:5:46:00 -- Nikko Kuhn V was in a brutal accident and has dropped out!!
+INFO:root:5:48:00 -- Rosanna Gleichner was in a brutal accident and has dropped out!!
+INFO:root:5:50:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2411  |  T2: 24  |  Run: 319  |  Finished: 0  |  DNF: 146 Queue Size:43700
+INFO:root:  Queue Sizes: (2912,0) (2899,0) (2889,0) (2898,0) (2891,0) (2928,0) (2935,0) (2917,0) (2922,0) (2936,0) (2905,0) (2914,0) (2914,0) (2914,0) (2926,0) 
+INFO:root:5:56:00 -- Akeem Wintheiser was in a brutal accident and has dropped out!!
+INFO:root:6:00:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2375  |  T2: 21  |  Run: 357  |  Finished: 0  |  DNF: 147 Queue Size:45520
+INFO:root:  Queue Sizes: (3034,0) (3016,0) (3007,0) (3013,0) (3009,0) (3043,0) (3055,0) (3035,0) (3041,0) (3075,0) (3038,0) (3040,0) (3033,0) (3041,0) (3040,0) 
+INFO:root:6:06:00 -- Roger Sporer was in a brutal accident and has dropped out!!
+INFO:root:6:08:00 -- Mr. Chad Schulist was in a brutal accident and has dropped out!!
+INFO:root:6:09:00 -- Kellen Kuhlman Jr. was in a brutal accident and has dropped out!!
+INFO:root:6:10:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2343  |  T2: 17  |  Run: 390  |  Finished: 0  |  DNF: 150 Queue Size:46234
+INFO:root:  Queue Sizes: (3080,0) (3078,0) (3049,0) (3069,0) (3057,0) (3087,0) (3107,0) (3082,0) (3082,0) (3119,0) (3084,0) (3085,0) (3085,0) (3088,0) (3082,0) 
+INFO:root:6:11:00 -- Rey Keeling Jr. was in a brutal accident and has dropped out!!
+INFO:root:6:12:00 -- Mr. Horace Rogahn II has bonked and decided to throw in the towel!!
+INFO:root:6:12:00 -- Dr. Adolf Wolf was in a brutal accident and has dropped out!!
+INFO:root:6:16:00 -- Allen Sauer was in a brutal accident and has dropped out!!
+INFO:root:6:20:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2320  |  T2: 6  |  Run: 420  |  Finished: 0  |  DNF: 154 Queue Size:47791
+INFO:root:  Queue Sizes: (3189,0) (3184,0) (3155,0) (3181,0) (3167,0) (3191,0) (3215,0) (3190,0) (3191,0) (3229,0) (3191,0) (3206,0) (3200,0) (3208,0) (3191,0) 
+INFO:root:6:26:00 -- Miss Dorris Beahan was in a brutal accident and has dropped out!!
+INFO:root:6:28:00 -- Emmanuel Homenick has bonked and decided to throw in the towel!!
+INFO:root:6:29:00 -- Maye Renner was in a brutal accident and has dropped out!!
+INFO:root:6:30:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2288  |  T2: 18  |  Run: 437  |  Finished: 0  |  DNF: 157 Queue Size:48986
+INFO:root:  Queue Sizes: (3265,0) (3260,0) (3233,0) (3240,0) (3237,0) (3270,0) (3283,0) (3269,0) (3270,0) (3308,0) (3266,0) (3271,0) (3271,0) (3273,0) (3270,0) 
+INFO:root:6:34:00 -- Grayce Schmidt was in a brutal accident and has dropped out!!
+INFO:root:6:40:00 ---   Swimmers: 0  |  T1: 0  |  Bike: 2251  |  T2: 29  |  Run: 462  |  Finished: 0  |  DNF: 158 Queue Size:50087
+INFO:root:  Queue Sizes: (3335,0) (3323,0) (3307,0) (3317,0) (3315,0) (3345,0) (3350,0) (3332,0) (3349,0) (3381,0) (3348,0) (3351,0) (3350,0) (3348,0) (3336,0) 

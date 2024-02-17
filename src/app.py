@@ -16,7 +16,12 @@
 #
 # V1.2 ClockTimes Refactor
 #   Added ClockTimes data gateway for Timing Mat Times
-
+#
+# V1.3 Add Detail endpoint
+#   Added detail endpoint (just displays athlete id for now)
+#   Added an "ALL" dropdown option
+#   Constants file
+#   Added Leaderboard to front page V1.0
 
 
 from flask import Flask, request, url_for, render_template
@@ -25,7 +30,8 @@ from src.components.ClockTimes import ClockTimes
 import json
 import time
 import datetime
-
+import logging
+from src.components.constants import *
 
 app = Flask(__name__)
 clocktimes = None
@@ -102,6 +108,7 @@ def massage(mylist):
     return retdict
 @app.route("/")
 def main():
+    leaderboard = request.args.get('leaderboard', default="MPRO")
     global clocktimes
     ldg, raceinfo, rname = get_header()
     if clocktimes is None: clocktimes = ClockTimes(rname)
@@ -118,17 +125,22 @@ def main():
     
     <h1>Racetrack Race Tracking Software</h1>
     <p>About: This software currently allows real time location tracking of simulated athletes in a simulated triathlon on a certain big island in Hawaii.</p>
+    <p>Any resemblence to real people or races is purely coincidental.</p>
+    <p>A description of the project maybe found at <a href="https://github.com/todddole/racetrack">https://github.com/todddole/racetrack</a></p>
+    <p>This is a pre-alpha version of the software, sorry if it takes a while for pages to load.  Speed optimizations coming soon...</p>
     
       
     '''
     returnstr += raceinfo
 
     returnstr += '''
+    <h3>Search by athlete name, race number, or race division:</h3>
     <form action="/status" method="post">
     <label for="name">Athlete Name or Race Number:</label><br>
     <input type="text" id="name" name="name"><br>
     <label for="agegroup">Or select a division:</label><br>
     <select name="agegroup" id="agegroup">
+      <option value="ALL">All Racers</option>
       <option value="MPRO">Male Professional</option>
       <option value="FPRO">Female Professional</option>
       <option value="M18-24">Male 18-24</option>
@@ -162,7 +174,78 @@ def main():
            
     <br><input type="submit" value="submit">
     </form>
+    <br>
+    <br>
+    <h1>Race Leaderboard: 
     '''
+
+    if leaderboard=="M80": leaderboard="M80+"
+    elif leaderboard=="F80": leaderboard="F80+"
+    if (leaderboard not in ANALYZE_DIVISIONS):
+        returnstr += "Error, division not found</h1>"
+        return returnstr
+
+    returnstr += leaderboard
+    lbdata = ldg.get_data(leaderboard, rname+"-Leaderboards")
+    lblocation = lbdata["location"]
+    if lblocation in TIMING_MATS.keys():
+        lblocation = TIMING_MATS[lblocation][0]
+    returnstr += " at " + lblocation + "</h1>\n"
+
+    returnstr += '''
+    <form id="lbform" action="/" method="get"><br>
+    <label for="leaderboard">Show Leaderboard For:</label>
+    <select name="leaderboard" id="leaderboard">
+      <option value="MPRO">Male Professional</option>
+      <option value="FPRO">Female Professional</option>
+      <option value="M18-24">Male 18-24</option>
+      <option value="F18-24">Female 18-24</option>
+      <option value="M25-29">Male 25-29</option>
+      <option value="F25-29">Female 25-29</option>
+      <option value="M30-34">Male 30-34</option>
+      <option value="F30-34">Female 30-34</option>
+      <option value="M35-39">Male 35-39</option>
+      <option value="F35-39">Female 35-39</option>
+      <option value="M40-44">Male 40-44</option>
+      <option value="F40-44">Female 40-44</option>
+      <option value="M45-49">Male 45-49</option>
+      <option value="F45-49">Female 45-49</option>
+      <option value="M50-54">Male 50-54</option>
+      <option value="F50-54">Female 50-54</option>
+      <option value="M55-59">Male 55-59</option>
+      <option value="F55-59">Female 55-59</option>
+      <option value="M60-64">Male 60-64</option>
+      <option value="F60-64">Female 60-64</option>
+      <option value="M65-69">Male 65-69</option>
+      <option value="F65-69">Female 65-69</option>
+      <option value="M70-74">Male 70-74</option>
+      <option value="F70-74">Female 70-74</option>
+      <option value="M75-79">Male 75-79</option>
+      <option value="F75-79">Female 75-79</option>
+      <option value="M80">Male 80+</option>
+      <option value="F80">Female 80+</option>
+    </select>
+    <input type=submit value="submit">
+    </form><br>
+    
+    
+    '''
+
+    returnstr += "<table><TR><TH>Race Number</TH><TH>Name</TH><TH>Time Behind Leader</TH></TR>\n"
+    for i in range(1,21):
+        key = str(i)
+        if key in lbdata.keys():
+            returnstr += "<tr><td>" + str(lbdata[key]["number"]) + "</td><td>" + \
+                str(lbdata[key]["name"]) + "</td><td>" + str(lbdata[key]["time"]) + "</td></tr>\n"
+
+    returnstr += "</table>"
+
+
+    return returnstr
+@app.route('/detail', methods=['GET'])
+def detail():
+    athid = request.args.get('id')
+    returnstr = "<H1>Details for " + athid + "</H1>:"
 
     return returnstr
 
@@ -218,8 +301,8 @@ def status():
 
         if (type == 'racename') and name not in athlete["name"]: continue
         mydivision = get_division(athlete["division"] , athlete["birthdate"], athlete["gender"])
-        if (type == 'division') and (mydivision != division): continue
-        returnstr += "<tr><td>" + str(key) + "</td><td>"
+        if (type == 'division') and (division!="ALL") and (mydivision != division): continue
+        returnstr += "<tr><td><a href='/detail?id=" + str(key) + "'>" + str(key) + "</a></td><td>"
         returnstr += ""+athlete["name"] + "</td><td>"+mydivision+"</td>\n"
 
         status = ""
@@ -287,5 +370,5 @@ if __name__ == "__main__":
     ldg, raceinfo, rname = get_header()
     if clocktimes is None: clocktimes = ClockTimes(rname)
     if (rname!=clocktimes.rname) : clocktimes = ClockTimes(rname)
-    print("Accepting Connections...")
+    logging.info("Accepting Connections...")
 

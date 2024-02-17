@@ -48,7 +48,22 @@ class TestLocationDataGateway(unittest.TestCase):
         retval = lDG.del_data(expected_id, "test")
         assert retval == 1
 
-    def test_drop_collection(self):
+    def test_upsert_data1(self):
+        lDG = LocationDataGateway()
+        expected_id = "test1234"
+        data = "TestData1234"
+
+        lDG.del_data(expected_id, "test")
+        retval = lDG.add_data(expected_id, data, "test")
+        assert retval == expected_id
+        data = "TestData2345"
+        retval = lDG.upsert_data(expected_id, data, "test")
+        assert retval == expected_id
+        data = lDG.get_data(expected_id, "test")
+        assert data == "TestData2345"
+
+
+def test_drop_collection(self):
         lDG = LocationDataGateway()
         lDG.add_data("1","test1234", "test1234")
         a=lDG.drop_collection("test1234")
