@@ -220,7 +220,11 @@ def main():
 
     returnstr += leaderboard
     lbdata = ldg.get_data(leaderboard, rname+"-Leaderboards")
+    if (lbdata is None):
+        returnstr += "No Data Yet</h1>"
+        return returnstr
     lblocation = lbdata["location"]
+
     pacetype = PACE_NONE
     if lblocation in TIMING_MATS.keys():
         pacetype = TIMING_MATS[lblocation][2]
