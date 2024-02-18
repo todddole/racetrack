@@ -1894,6 +1894,7 @@ PACE_BIKE_SPEED=2
 PACE_RUN_SPEED=3
 
 TIMING_MATS = {
+    "RaceStart": ("Swim Course Start", 0, PACE_NONE),
     "EnterT1" : ("Swim Course Finish", 4000, PACE_SWIM_SPEED),
     "BikeStart" : ("Bike Course Start", 0, PACE_NONE),
     "BikeTM1" : ("Bike Course Time Mat 1 (40k)", 39937, PACE_BIKE_SPEED),
