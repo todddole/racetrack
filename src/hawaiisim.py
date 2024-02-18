@@ -499,7 +499,7 @@ class RaceAthlete(Athlete):
         device_count[self.deviceid] = device_count[self.deviceid]+1
         data = {"dev": self.deviceid, "time":str(time.time()), "la":str(self.location[0]), "lo":str(self.location[1]), "nl":"[]"}
         if (self.division=='MPRO') or (self.division=='FPRO'):
-            race.report_data(key, data, priority=True, extraname="locations")
+            race.report_data(key, data, priority=True, extraname="-locations")
             return
 
         self.locdatarecord[key]=data

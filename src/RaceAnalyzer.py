@@ -32,6 +32,7 @@ import pika
 from dotenv import load_dotenv
 
 lastupdate = None
+race=None
 def get_pace(phase, lastphase, curtime, lasttime):
     if phase not in TIMING_MATS or lastphase not in TIMING_MATS:
         return ""
@@ -238,16 +239,36 @@ class Race:
             data[str(i+1)] = dataarray[i]
         x=self.ldg.upsert_data(division, data, self.rname +"-Leaderboards")
 
+    def confirm_race(self):
+        racelist = self.ldg.get_all_data("racelist")
+        if (len(racelist) == 0):
+            logging.error("No racelist")
+            sys.exit(-1)
+        bignum = 0
+        rname = ""
+        for r in racelist:
+            rnum = int(r["_id"])
+            if (rnum > bignum):
+                bignum = rnum
+                rname = r["data"]
+        newrname = rname["data"]
+        newrname = "race" + newrname
+        if (self.rname!=newrname): return False
+        return True
+
+
     def make_leaderboards(self):
         for division in ANALYZE_DIVISIONS:
             self.make_leaderboard(division)
 
 def callback(ch, method, properties, body):
     global lastupdate
+    global race
     logging.info("Received" + str(body))
     curtime = time.time()
     if (lastupdate is not None) and (curtime - lastupdate < 120): return
     lastupdate = curtime
+    if (race.confirm_race()==False): race=Race()
     race.make_leaderboards()
 
 
