@@ -139,8 +139,15 @@ class Race:
                 self.athletes[athlete]["birthdate"],
                 self.athletes[athlete]["gender"]
             )
-        self.starttime = float(self.ldg.get_data("starttime", self.rname))
-        self.starttime = int(self.starttime)
+
+        self.starttime = 0
+        while (self.starttime==0):
+            try:
+                ourstarttime = ldg.get_data("starttime", self.rname)
+                self.starttime = float(self.ldg.get_data("starttime", self.rname))
+                self.starttime = int(self.starttime)
+            except Exception as e:
+                time.sleep(10)
 
     def get_race_phase(self, division, min_racer):
         starters = self.clocktimes.get_phasers("RaceStart")

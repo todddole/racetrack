@@ -495,7 +495,7 @@ class RaceAthlete(Athlete):
         race.dnfers += 1
 
     def report_location(self):
-        key = urllib.parse.quote_plus(self.deviceid) + str(device_count[self.deviceid])
+        key = urllib.parse.quote_plus(self.deviceid) + "-" + str(device_count[self.deviceid])
         device_count[self.deviceid] = device_count[self.deviceid]+1
         data = {"dev": self.deviceid, "time":str(time.time()), "la":str(self.location[0]), "lo":str(self.location[1]), "nl":"[]"}
         if (self.division=='MPRO') or (self.division=='FPRO'):

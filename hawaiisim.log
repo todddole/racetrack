@@ -3165,3 +3165,9 @@ INFO:root:Starting the Pro Men Race!
 INFO:root:0:10:00 ---   Swimmers: 250  |  T1: 0  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 0 Queue Size:0
 INFO:root:  Queue Sizes: (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) 
 INFO:root:Starting the Pro Women Race!
+INFO:root:Starting HawaiiSim
+INFO:root:Loading athletes
+INFO:root:Loaded 2900 athletes
+INFO:root:Waiting until 05:16 for the race to start...
+INFO:root:Starting race at 1708254969.5122473  windfactor=0.9274879987808503  heatfactor=0.9779861069099776
+INFO:root:Starting the Pro Men Race!
