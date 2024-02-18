@@ -143,8 +143,8 @@ class Race:
         self.starttime = 0
         while (self.starttime==0):
             try:
-                ourstarttime = ldg.get_data("starttime", self.rname)
-                self.starttime = float(self.ldg.get_data("starttime", self.rname))
+                ourstarttime = self.ldg.get_data("starttime", self.rname)
+                self.starttime = float(ourstarttime)
                 self.starttime = int(self.starttime)
             except Exception as e:
                 time.sleep(10)

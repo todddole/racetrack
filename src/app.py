@@ -289,6 +289,7 @@ def main():
     return returnstr
 @app.route('/detail', methods=['GET'])
 def detail():
+    send_rabbit_mq("leaderboard")
     athid = request.args.get('id')
     returnstr = "<H1>Details for " + athid + "</H1>:"
 
@@ -298,6 +299,7 @@ def detail():
 def status():
     global clocktimes
 
+    send_rabbit_mq("leaderboard")
     ldg, raceinfo, rname = get_header()
     if clocktimes is None: clocktimes = ClockTimes(rname)
     if (rname!=clocktimes.rname) : clocktimes = ClockTimes(rname)

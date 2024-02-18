@@ -151,6 +151,7 @@ class DataReporter(Thread):
         self.api_url = api_url
         self.api_key = api_key
         self.threadlist = []
+        self.qsize=0
 
     def report(self, item, priority=False):
         if (priority):
@@ -159,13 +160,13 @@ class DataReporter(Thread):
             self.q.put(item)
 
     def queuesize(self):
-        qsize = 0
+        self.qsize = 0
         for i in self.threadlist:
-            qsize+=i.q.qsize() + i.pq.qsize()
-        return qsize
+            self.qsize+=i.q.qsize() + i.pq.qsize()
+        return self.qsize
 
     def logqsizes(self):
-        qsizelist = "  Queue Sizes: "
+        qsizelist = "  Queue Sizes: Total: " + str(self.qsize) + "  "
         for i in self.threadlist:
             qsizelist+="("+str(i.q.qsize()) + "," + str(i.pq.qsize())+") "
         logging.info(qsizelist)
@@ -185,7 +186,7 @@ class DataReporter(Thread):
             elif (not self.q.empty()):
                 item = self.q.get()
             else:
-                time.sleep(1)
+                time.sleep(0.1)
                 continue
 
             # we should have an item, process it
@@ -246,6 +247,8 @@ class RaceStarter(Thread):
         if (self.srace.athletecount>0):
             logging.info("Starting the Age Groupers!")
 
+        random.shuffle(self.srace.athletelist)
+        self.srace.athletelist.sort(key=get_ath_div_name, reverse=True)
         while len(self.srace.athletelist) > 0:
             athlete = self.srace.athletelist.pop()
             athlete.start()
@@ -342,6 +345,9 @@ def get_div(division, birthdate, gender):
     else:
         ourdiv += '80+'
     return ourdiv
+
+def get_ath_div_name(e):
+    return get_div(e.division, e.birthdate, e.gender) + e.name
 
 
 class RaceAthlete(Athlete):
@@ -506,7 +512,8 @@ class RaceAthlete(Athlete):
         sizefactor=2
         if (race.qsize) > 50 and (race.qsize)< 200: sizefactor=5
         elif (race.qsize) < 500: sizefactor=10
-        else: sizefactor=20
+        elif (race.qsize) < 10000: sizefactor = 20
+        else: sizefactor=60
         if (len(self.locdatarecord)>=sizefactor) and (random.randint(1,2)==2):
             race.report_data("multipart", self.locdatarecord, priority=False, extraname="-locations")
             self.locdatarecord={}
@@ -928,8 +935,7 @@ if __name__ == '__main__':
     logging.basicConfig(
         level=LOGLEVEL,
         handlers=[
-            logging.FileHandler("hawaiisim.log"),
-            logging.StreamHandler()
+            logging.FileHandler("hawaiisim.log")
         ])
     logging.info('Starting HawaiiSim')
 
@@ -957,10 +963,13 @@ if __name__ == '__main__':
     rtime = 0
 
     while (race.started == 0): time.sleep(0.1)
+    cyclelength = 0
 
     while not race.is_done():
         update_start = time.time()
         race.update_status(cycletime)
+        cyclelength += time.time() - update_start
+
         race.setqsize()
 
 
@@ -970,14 +979,15 @@ if __name__ == '__main__':
 
         cycles+=1
         if (cycles % 10 == 0):
+            cyclelength /= 10
 
             logging.info("" +str(datetime.timedelta(seconds=rtime)) + " --- " +
                          "  Swimmers: " + str(race.swimmers) + "  |  T1: "+str(race.t1ers) +
                          "  |  Bike: " + str(race.bikers) + "  |  T2: " + str(race.t2ers) +
                          "  |  Run: " + str(race.runners) + "  |  Finished: " + str(race.finishers) +
-                         "  |  DNF: " + str(race.dnfers) + " Queue Size:" + str(race.qsize))
+                         "  |  DNF: " + str(race.dnfers) + " Cycle Length:" + str(int(cyclelength)))
             race.logqsize()
-
+            cyclelength=0
 
         if (cycles == 60):
             if (SHOWPLT):

@@ -3171,3 +3171,42 @@ INFO:root:Loaded 2900 athletes
 INFO:root:Waiting until 05:16 for the race to start...
 INFO:root:Starting race at 1708254969.5122473  windfactor=0.9274879987808503  heatfactor=0.9779861069099776
 INFO:root:Starting the Pro Men Race!
+INFO:root:0:10:00 ---   Swimmers: 250  |  T1: 0  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 0 Queue Size:0
+INFO:root:  Queue Sizes: (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) 
+INFO:root:Starting the Pro Women Race!
+INFO:root:0:14:00 -- Isabella Swift was eaten by a shark!!
+INFO:root:0:20:00 ---   Swimmers: 399  |  T1: 0  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 1 Queue Size:0
+INFO:root:  Queue Sizes: (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) 
+INFO:root:Starting the Age Groupers!
+INFO:root:0:24:00 -- Ezra Kozey was eaten by a shark!!
+INFO:root:0:26:00 -- Prof. Timmothy Dickens was eaten by a shark!!
+INFO:root:0:29:00 -- Prof. Uriah Jast V was eaten by a shark!!
+INFO:root:0:30:00 ---   Swimmers: 938  |  T1: 0  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 4 Queue Size:0
+INFO:root:  Queue Sizes: (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) 
+INFO:root:0:31:00 -- Dr. Orland Hegmann was eaten by a shark!!
+INFO:root:Starting HawaiiSim
+INFO:root:Loading athletes
+INFO:root:Loaded 2900 athletes
+INFO:root:Waiting until 05:53 for the race to start...
+INFO:root:Starting race at 1708257187.3402464  windfactor=0.9316610517132666  heatfactor=0.9252949057513965
+INFO:root:Starting the Pro Men Race!
+INFO:root:Starting HawaiiSim
+INFO:root:Loading athletes
+INFO:root:Loaded 2900 athletes
+INFO:root:Waiting until 06:03 for the race to start...
+INFO:root:Starting race at 1708257787.736252  windfactor=0.9594581952274539  heatfactor=0.9832771201888688
+INFO:root:Starting the Pro Men Race!
+INFO:root:0:10:00 ---   Swimmers: 250  |  T1: 0  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 0 Cycle Length:0
+INFO:root:  Queue Sizes: Total: 82  (0,5) (0,6) (0,5) (0,5) (0,6) (0,5) (0,6) (0,5) (0,6) (0,6) (0,5) (0,5) (0,5) (0,6) (0,6) 
+INFO:root:Starting the Pro Women Race!
+INFO:root:0:20:00 ---   Swimmers: 400  |  T1: 0  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 0 Cycle Length:0
+INFO:root:  Queue Sizes: Total: 307  (0,20) (0,20) (0,20) (0,20) (0,20) (0,19) (0,20) (0,20) (0,21) (0,21) (0,21) (0,21) (0,21) (0,21) (0,21) 
+INFO:root:Starting the Age Groupers!
+INFO:root:0:30:00 ---   Swimmers: 942  |  T1: 0  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 0 Cycle Length:0
+INFO:root:  Queue Sizes: Total: 387  (1,25) (0,25) (0,25) (0,25) (0,26) (0,26) (0,26) (0,26) (0,26) (0,26) (0,26) (0,26) (0,26) (0,26) (0,26) 
+INFO:root:0:38:00 -- Lesley Haley was eaten by a shark!!
+INFO:root:0:38:00 -- Prof. Abigail Bins V was eaten by a shark!!
+INFO:root:0:39:00 -- Amos Gleichner DDS was eaten by a shark!!
+INFO:root:0:40:00 ---   Swimmers: 1536  |  T1: 3  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 3 Cycle Length:0
+INFO:root:  Queue Sizes: Total: 453  (4,26) (4,26) (4,26) (4,26) (4,26) (5,25) (5,25) (5,26) (5,26) (5,26) (4,26) (4,26) (3,27) (4,26) (4,26) 
+INFO:root:0:42:00 -- Malika Stamm was eaten by a shark!!
