@@ -20,6 +20,11 @@
 #
 # Version 1.3
 #   Run Timing Mat Distance Fix
+#   Bike Turnaround Timing Mat Distance Fix
+#   Fixed leaderboards to use time since individual athlete start
+#       instead of time since race start
+#       (This resulted in race time being off for leader and
+#       sometimes minor errors in order for everyone else)
 
 from src.components.LocationDataGateway import LocationDataGateway
 from src.components.ClockTimes import ClockTimes, massage
@@ -37,7 +42,7 @@ from dotenv import load_dotenv
 # GLOBAL VARIABLES
 lastupdate = None
 race=None
-RABBITMQ = False
+RABBITMQ = True
 
 def get_pace(phase, lastphase, curtime, lasttime):
     if phase not in TIMING_MATS or lastphase not in TIMING_MATS:
@@ -200,6 +205,7 @@ class Race:
         lastphase = ANALYZER_CATEGORIES[ANALYZER_CATEGORIES.index(phase) -1]
         phasers = self.clocktimes.get_phasers(phase)
         lastphasers = self.clocktimes.get_phasers(lastphase)
+        starters = self.clocktimes.get_phasers("RaceStart")
         divphasers = []
         divathletes = []
         times = []
@@ -210,8 +216,8 @@ class Race:
         for ph in phasers:
             athid = self.racenumbers[ph]
             athlete=self.athletes[athid]
-            athtime = phasers[ph]
-            lasttime = lastphasers[ph]
+            athtime = float(phasers[ph])-float(starters[ph])
+            lasttime = float(lastphasers[ph])-float(starters[ph])
             if (athlete["division"] == division):
                 divphasers.append(athid)
                 divathletes.append(athlete)
@@ -234,7 +240,7 @@ class Race:
 
         dataarray = []
         zerotime = int(zerotime)
-        leadertime = str(datetime.timedelta(seconds=zerotime - self.starttime)) + " Race Time"
+        leadertime = str(datetime.timedelta(seconds=zerotime)) + " Race Time"
         pace = get_pace(phase, lastphase, times[0], timeslast[0])
         dataarray.append({"number":divphasers[0], "name":divathletes[0]["name"], "time": leadertime, "pace":pace})
 
@@ -243,13 +249,12 @@ class Race:
         data["1"] = dataarray[0]
 
         for i in range(1, shownum):
-            ourtime = float(times[i])
-            ourtime = int(ourtime)
+            ourtime = int(times[i])
             ourpace = get_pace(phase, lastphase, times[i], timeslast[i])
-            if (i==1): logging.info("" + divphasers[i] + " " + divathletes[i]["name"] + " - " + times[i] + " +" +str(datetime.timedelta(seconds=ourtime - zerotime)) + " - " + ourpace)
-            else: logging.debug("" + divphasers[i] + " " + divathletes[i]["name"] + " - " + times[i] + " +" +str(datetime.timedelta(seconds=ourtime - zerotime))+ " - " + ourpace)
+            if (i==1): logging.info("" + divphasers[i] + " " + divathletes[i]["name"] + " - " + str(times[i]) + " +" +str(datetime.timedelta(seconds=ourtime-zerotime )) + " - " + ourpace)
+            else: logging.debug("" + divphasers[i] + " " + divathletes[i]["name"] + " - " + str(times[i]) + " +" +str(datetime.timedelta(seconds=ourtime-zerotime))+ " - " + ourpace)
             dataarray.append({"number": divphasers[i], "name": divathletes[i]["name"],
-                              "time": "+" + str(datetime.timedelta(seconds=ourtime - zerotime)),
+                              "time": "+" + str(datetime.timedelta(seconds=ourtime-zerotime)),
                               "pace":ourpace})
             data[str(i+1)] = dataarray[i]
         x=self.ldg.upsert_data(division, data, self.rname +"-Leaderboards")
@@ -313,5 +318,5 @@ if __name__ == '__main__':
 
 
 
-    race.make_leaderboard("MPRO", "RunTM1")
+
 

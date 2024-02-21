@@ -2,23 +2,9 @@ from src.components.LocationDataGateway import LocationDataGateway
 from threading import Thread
 import time
 import logging
+from src.components.constants import *
 
-TIME_MAT_CATEGORIES = [
-    "RaceStart",
-    "EnterT1",
-    "BikeStart",
-    "EnterT2",
-    "RunStart",
-    "RaceFinish",
-    "BikeTM1",
-    "BikeTM2",
-    "BikeTM3",
-    "BikeTM4",
-    "RunTM1",
-    "RunTM2",
-    "RunTM3",
-    "DNF"
-]
+TIME_MAT_CATEGORIES = ANALYZER_CATEGORIES
 
 TIME_THRESHOLD = 120
 def massage(mylist):

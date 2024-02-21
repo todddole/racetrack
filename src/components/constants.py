@@ -1899,7 +1899,7 @@ TIMING_MATS = {
     "BikeStart" : ("Bike Course Start", 0, PACE_NONE),
     "BikeTM1" : ("Bike Course Time Mat 1 (40k)", 39937, PACE_BIKE_SPEED),
     "BikeTM2" : ("Bike Course Time Mat 2 (80k)", 80436, PACE_BIKE_SPEED),
-    "BikeTM3" : ("Bike Course Time Mat 3 (Hawii Turnaround)", 103578, PACE_BIKE_SPEED),
+    "BikeTM3" : ("Bike Course Time Mat 3 (Hawii Turnaround)", 96348, PACE_BIKE_SPEED),
     "BikeTM4" : ("Bike Course Time Mat 4 (120k)", 120094, PACE_BIKE_SPEED),
     "BikeTM5" : ("Bike Course Time Mat 5", 160007, PACE_BIKE_SPEED),
     "EnterT2" : ("Bike Course Finish", 180000, PACE_BIKE_SPEED),
