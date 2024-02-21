@@ -396,23 +396,23 @@ class RaceAthlete(Athlete):
             runrec = race.runrecfemale
         swimcut = race.swimcut
 
-
-        swimtimepct = 1 - (self.swimstr / 100) + random.uniform(-.07, 0.03)
-        swimtime = ((swimcut - swimrec) * swimtimepct) + swimrec
+        swimcourseadjust=1.02 # factor due to course being slightly off
+        swimtimepct = 1 - (self.swimstr / 100) + random.uniform(-.07, 0.01)
+        swimtime = (((swimcut - swimrec) * swimtimepct) + swimrec) * swimcourseadjust
         self.swimspd = 3800 / swimtime
 
         bikecut = race.bikecut
 
         bikecourseadjust = 1.03 # factor due to bike course being slightly off
-        biketimepct=1 - (self.bikestr / 100) + random.uniform(-.07, 0.03) * (1/race.windfactor) * bikecourseadjust
-        biketime = ((bikecut - bikerec) * biketimepct) + bikerec
+        biketimepct=1 - (self.bikestr / 100) + random.uniform(-.07, 0.01)
+        biketime = (((bikecut - bikerec) * biketimepct) + bikerec) * (1/race.windfactor) * bikecourseadjust
         self.bikespd = 180000 / biketime
 
 
         runcut = (60*60*8)
         runcourseadjust = 1.02 #factor due to run course distance being slightly off
-        runtimepct = 1 - (self.runstr / 100) + random.uniform(-.07, 0.03) * (1/race.heatfactor) * runcourseadjust
-        runtime = ((runcut - runrec) * runtimepct) + runrec
+        runtimepct = 1 - (self.runstr / 100) + random.uniform(-.07, 0.01)
+        runtime = (((runcut - runrec) * runtimepct) + runrec) * (1/race.heatfactor) * runcourseadjust
         self.runspd = 42000 / runtime
 
         self.location = race.swimcrs[0]
@@ -447,7 +447,7 @@ class RaceAthlete(Athlete):
         logging.debug("Run Start: " + self.name + " has entered the bike course!")
         race.t2ers -= 1
         race.runners += 1
-        race.report_data(str(self.racenum), str(time.time()), priority=True, extraname="-RunStart")
+        race.report_data(str(self.racenum), str(time.time()-self.t2left), priority=True, extraname="-RunStart")
 
     def start_bike(self):
         self.status=3
@@ -456,7 +456,7 @@ class RaceAthlete(Athlete):
         logging.debug("Bike Start: " + self.name + " has entered the bike course!")
         race.t1ers -=1
         race.bikers += 1
-        race.report_data(str(self.racenum), str(time.time()), priority=True, extraname="-BikeStart")
+        race.report_data(str(self.racenum), str(time.time()-self.t1left), priority=True, extraname="-BikeStart")
 
     def finish(self, addtime):
         self.status = 10
@@ -719,7 +719,7 @@ class Race:
 
         self.bikecrs = BIKECRS
 
-        self.biketm=[300, 600, 900, 1200]
+        self.biketm= BIKE_TIME_MATS
 
         self.runcrs = RUNCRS
 

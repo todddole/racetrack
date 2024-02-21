@@ -17,6 +17,9 @@
 #   Consumes RabbitMQ queue
 #   On message, checks if >2 minutes have passed since last leaderboard refresh,
 #     and if so, refreshes leaderboards
+#
+# Version 1.3
+#   Run Timing Mat Distance Fix
 
 from src.components.LocationDataGateway import LocationDataGateway
 from src.components.ClockTimes import ClockTimes, massage
@@ -31,8 +34,11 @@ import os
 import pika
 from dotenv import load_dotenv
 
+# GLOBAL VARIABLES
 lastupdate = None
 race=None
+RABBITMQ = False
+
 def get_pace(phase, lastphase, curtime, lasttime):
     if phase not in TIMING_MATS or lastphase not in TIMING_MATS:
         return ""
@@ -174,8 +180,10 @@ class Race:
             cumdist += legdist
             outln += str(legdist) + "  " + str(cumdist)
             print(outln)
-    def make_leaderboard(self, division):
-        phase = self.get_race_phase(division, 10)
+    def make_leaderboard(self, division, dophase=""):
+        phase=dophase[:]
+        if (phase == ""):
+            phase = self.get_race_phase(division, 10)
 
         if (phase==""):
             data = {"location": "Not Started"}
@@ -283,26 +291,27 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
     load_dotenv()
-    rmqurl = os.getenv("RABBITMQ_URL", "")
-    rmqque = os.getenv("RABBITMQ_QUEUE", "")
+
     race = Race()
+    if (RABBITMQ == True):
+        rmqurl = os.getenv("RABBITMQ_URL", "")
+        rmqque = os.getenv("RABBITMQ_QUEUE", "")
+        #race.analyze_course_distance(race.swimcrs)
+        try:
+            params=pika.URLParameters(rmqurl)
+            connection = pika.BlockingConnection(params)
+            channel = connection.channel()
+            channel.queue_declare(queue=rmqque)
+            channel.basic_consume(rmqque,
+                                  callback,
+                                  auto_ack=True)
+
+        except Exception as e:
+            pass
+        channel.start_consuming()
+        connection.close()
 
 
-    try:
-        params=pika.URLParameters(rmqurl)
-        connection = pika.BlockingConnection(params)
-        channel = connection.channel()
-        channel.queue_declare(queue=rmqque)
-        channel.basic_consume(rmqque,
-                              callback,
-                              auto_ack=True)
 
-    except Exception as e:
-        pass
-    channel.start_consuming()
-    connection.close()
-
-
-
-
+    race.make_leaderboard("MPRO", "RunTM1")
 

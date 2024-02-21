@@ -1895,7 +1895,7 @@ PACE_RUN_SPEED=3
 
 TIMING_MATS = {
     "RaceStart": ("Swim Course Start", 0, PACE_NONE),
-    "EnterT1" : ("Swim Course Finish", 4000, PACE_SWIM_SPEED),
+    "EnterT1" : ("Swim Course Finish", 3795, PACE_SWIM_SPEED),
     "BikeStart" : ("Bike Course Start", 0, PACE_NONE),
     "BikeTM1" : ("Bike Course Time Mat 1 (40k)", 39937, PACE_BIKE_SPEED),
     "BikeTM2" : ("Bike Course Time Mat 2 (80k)", 80436, PACE_BIKE_SPEED),
@@ -1904,9 +1904,9 @@ TIMING_MATS = {
     "BikeTM5" : ("Bike Course Time Mat 5", 160007, PACE_BIKE_SPEED),
     "EnterT2" : ("Bike Course Finish", 180000, PACE_BIKE_SPEED),
     "RunStart" : ("Run Course Start", 0, PACE_NONE),
-    "RunTM1" : ("Run Course Time Mat 1 (10k)", 5665, PACE_RUN_SPEED),
-    "RunTM2" : ("Run Course Time Mat 2 (20k)", 11468, PACE_RUN_SPEED),
-    "RunTM3" : ("Run Course Time Mat 3 (30k)", 24834, PACE_RUN_SPEED),
+    "RunTM1" : ("Run Course Time Mat 1 (10k)", 10088, PACE_RUN_SPEED),
+    "RunTM2" : ("Run Course Time Mat 2 (20k)", 20088, PACE_RUN_SPEED),
+    "RunTM3" : ("Run Course Time Mat 3 (30k)", 30063, PACE_RUN_SPEED),
     "RunTM4" : ("Run Course Time Mat 4 (40k)", 37208, PACE_RUN_SPEED)
 }
 
