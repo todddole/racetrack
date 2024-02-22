@@ -188,7 +188,7 @@ class Race:
     def make_leaderboard(self, division, dophase=""):
         phase=dophase[:]
         if (phase == ""):
-            phase = self.get_race_phase(division, 10)
+            phase = self.get_race_phase(division, 3)
 
         if (phase==""):
             data = {"location": "Not Started"}

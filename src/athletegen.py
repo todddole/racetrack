@@ -100,6 +100,15 @@ def generateAthlete(athleteid, deviceid, category):
     athbikestr = max(min(strength + randint(-10+(profactor//2),11), 100), -25)
     athrunstr = max(min(strength + randint(-15,11), 100), -25)
 
+    while (athswimstr + athbikestr + athrunstr > 296):
+        rednum = randint(1,3)
+        if rednum == 1:
+            athswimstr -= randint(1,2)
+        elif rednum == 2:
+            athbikestr -= randint(1,2)
+        else:
+            athrunstr -= randint(1,2)
+
     #athlete['swimstr'] = str(swimstr)
     #athlete['bikestr'] = str(bikestr)
     #athlete['runstr'] = str(runstr)
@@ -126,8 +135,8 @@ if __name__ == '__main__':
     idlist = []
     ldg = LocationDataGateway()
 
-    athleteid=2844
-    deviceid=2844
+    athleteid=0
+    deviceid=0
     category = 0
 
     for i in range(10000):

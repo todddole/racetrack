@@ -18,9 +18,8 @@ class LocationDataGateway:
         '@rtcluster0.pctg1sv.mongodb.net/?retryWrites=true&w=majority'
 
         client = pymongo.MongoClient(dbString) # establish connection
-        mongo_db = client.db
-        #mongo_db.racetrack.drop()
-    
+        mongo_db = client.racetrackdb
+
         return mongo_db
 
     def add_data(self, id, data, collection_name):

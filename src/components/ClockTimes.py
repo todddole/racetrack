@@ -37,7 +37,9 @@ class ClockTimes:
             self.lastupdates.append(0)
 
         for i in range(len(TIME_MAT_CATEGORIES)):
-            self.timedata[i]=massage(self.ldg.get_all_data(self.rname + "-" + TIME_MAT_CATEGORIES[i]))
+            call_name = self.rname + "-" + TIME_MAT_CATEGORIES[i]
+            data = self.ldg.get_all_data(call_name)
+            self.timedata[i]=massage(data)
             logging.debug(" init "+TIME_MAT_CATEGORIES[i] + " size "+str(len(self.timedata[i])))
             self.lastupdates[i] = time.time()
 

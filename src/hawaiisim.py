@@ -54,7 +54,13 @@
 #
 # V1.23
 #   Faster Transitions for pros
-
+#
+# V1.3
+#   Added a slight strength reduction:
+#       if all their strengths add up to > 296 (average 99 or higher):
+#       Randomly reduce values until the total is 295-296
+#       Should prevent athletes setting records in all 3 sports on the same day.
+#       Added athlete str's to raceresults csv for better tuning
 
 from components.LocationDataGateway import LocationDataGateway
 from components.Athlete import Athlete
@@ -80,8 +86,6 @@ import requests
 import urllib.parse
 from components.constants import *
 
-
-
 race = None
 #----- Local Constants
 
@@ -94,7 +98,8 @@ DEFAULT_API_KEY = "youareanironman"
 REPORT_WORKER = 15
 
 #----- Global Variables
-device_count={}
+device_count = {}
+
 class ApiReporter(Thread):
     # Maintains a high priority and low priority queue
     # Accepts data on queues for transmission to rest api
@@ -107,18 +112,19 @@ class ApiReporter(Thread):
         self.api_key = api_key
 
     def add(self, item, priority=False):
-        if (priority==True):
+        if (priority == True):
             self.pq.put(item)
         else:
             self.q.put(item)
 
     def finish(self):
         self.finished = True
+
     def run(self):
         while (not self.finished) or (not self.q.empty()) or (not self.pq.empty()):
-            if (not self.pq.empty()):
+            if not self.pq.empty():
                 item = self.pq.get()
-            elif (not self.q.empty()):
+            elif not self.q.empty():
                 item = self.q.get()
             else:
                 time.sleep(0.1)
@@ -127,7 +133,7 @@ class ApiReporter(Thread):
             key = item["key"]
             data = item["data"]
             try:
-                url=self.api_url+key+"/"
+                url = self.api_url+key+"/"
 
                 response = requests.post(url, data=json.dumps(data),
                                          headers={"Content-Type":"application/json"})
@@ -363,6 +369,13 @@ class RaceAthlete(Athlete):
         outstr += str(self.status)
 
         outstr += ","
+        outstr += str(self.swimstr)
+        outstr += ","
+        outstr += str(self.bikestr)
+        outstr += ","
+        outstr += str(self.runstr)
+        outstr += ","
+
         outstr += str(datetime.timedelta(seconds=self.swimsec + self.t1sec + self.bikesec + self.t2sec + self.runsec))
 
         outstr += ","
@@ -394,6 +407,17 @@ class RaceAthlete(Athlete):
             swimrec = race.swimrecfemale
             bikerec = race.bikerecfemale
             runrec = race.runrecfemale
+
+        while (self.swimstr + self.bikestr + self.runstr > 296):
+            rednum = random.randint(1,3)
+            if rednum == 1:
+                self.swimstr -= random.randint(1,2)
+            elif rednum == 2:
+                self.bikestr -= random.randint(1,2)
+            else:
+                self.runstr -= random.randint(1,2)
+
+
         swimcut = race.swimcut
 
         swimcourseadjust=1.02 # factor due to course being slightly off
@@ -860,11 +884,6 @@ class Race:
 
         if (len(self.racinglist)==0):
             self.end_race()
-
-
-
-
-
 
     def is_done(self):
         return self.isdone
