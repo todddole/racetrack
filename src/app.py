@@ -289,11 +289,28 @@ def main():
     return returnstr
 @app.route('/detail', methods=['GET'])
 def detail():
+    global clocktimes
     send_rabbit_mq("leaderboard")
     athid = request.args.get('id')
+
+    ldg, raceinfo, rname = get_header()
+    location, loctime = clocktimes.get_location_and_time(athid)
+
+
+
     returnstr = "<H1>Details for " + athid + "</H1>:"
+    returnstr += "Last Known Location:<br>\n"
+    secondsago = int(time.time() - float(loctime))
+    returnstr += str(location) + ", reported " + str(secondsago) + " seconds ago<br>\n"
+
+    input_lat = location[0]
+    input_long = location[1]
+
+    returnstr += render_template('map.html')
+    returnstr += "<script>initMap( " + str(input_lat) + ", " + str(input_long) + " );</script>"
 
     return returnstr
+
 
 @app.route("/status", methods=['POST'])
 def status():

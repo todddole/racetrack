@@ -16670,3 +16670,25 @@ INFO:root:Loaded 2895 athletes
 INFO:root:Waiting until 10:08 for the race to start...
 INFO:root:Starting race at 1708618089.6768558  windfactor=0.9162845968717646  heatfactor=0.9207075899383171
 INFO:root:Starting the Pro Men Race!
+INFO:root:0:10:00 ---   Swimmers: 50  |  T1: 0  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 0 Cycle Length:0
+INFO:root:  Queue Sizes: Total: 0  (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) 
+INFO:root:Starting the Pro Women Race!
+INFO:root:0:20:00 ---   Swimmers: 95  |  T1: 0  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 0 Cycle Length:0
+INFO:root:  Queue Sizes: Total: 90  (0,6) (0,6) (0,5) (0,6) (0,6) (0,6) (0,6) (0,6) (0,6) (0,6) (0,6) (0,6) (0,6) (0,7) (0,6) 
+INFO:root:Starting the Age Groupers!
+INFO:root:0:30:00 ---   Swimmers: 636  |  T1: 0  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 0 Cycle Length:0
+INFO:root:  Queue Sizes: Total: 135  (4,5) (3,6) (3,6) (3,6) (3,6) (3,6) (4,5) (4,5) (4,5) (4,5) (4,5) (4,5) (4,5) (4,5) (4,5) 
+INFO:root:0:39:00 -- Juliana Stamm was eaten by a shark!!
+INFO:root:0:40:00 ---   Swimmers: 1236  |  T1: 0  |  Bike: 0  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 1 Cycle Length:0
+INFO:root:  Queue Sizes: Total: 93  (1,6) (1,6) (1,6) (0,6) (0,6) (0,6) (1,5) (1,5) (1,5) (1,5) (1,5) (1,5) (1,5) (1,5) (1,5) 
+INFO:root:0:41:00 -- Emelie Hoeger was eaten by a shark!!
+INFO:root:0:50:00 ---   Swimmers: 1804  |  T1: 7  |  Bike: 24  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 2 Cycle Length:0
+INFO:root:  Queue Sizes: Total: 232  (10,6) (10,7) (9,6) (9,7) (8,7) (10,6) (8,8) (9,7) (8,7) (7,7) (8,7) (8,7) (9,7) (8,7) (8,7) 
+INFO:root:0:59:00 -- Alicia Kemmer was eaten by a shark!!
+INFO:root:1:00:00 ---   Swimmers: 2370  |  T1: 8  |  Bike: 56  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 3 Cycle Length:0
+INFO:root:  Queue Sizes: Total: 503  (29,7) (26,7) (27,7) (27,6) (26,7) (27,7) (26,7) (27,7) (26,7) (26,7) (27,6) (27,6) (26,6) (27,7) (28,7) 
+INFO:root:1:06:00 -- Jamey Reinger was eaten by a shark!!
+INFO:root:1:06:00 -- Herbert Johnson was eaten by a shark!!
+INFO:root:1:07:00 -- Dr. Toni Cruickshank was eaten by a shark!!
+INFO:root:1:10:00 ---   Swimmers: 2797  |  T1: 7  |  Bike: 85  |  T2: 0  |  Run: 0  |  Finished: 0  |  DNF: 6 Cycle Length:0
+INFO:root:  Queue Sizes: Total: 431  (20,7) (23,6) (23,6) (22,7) (23,7) (21,5) (22,6) (23,6) (23,5) (23,5) (22,7) (22,6) (24,7) (23,7) (24,6) 

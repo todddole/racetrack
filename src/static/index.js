@@ -13,7 +13,7 @@ async function initMap(input_lat, input_long) {
   map = new Map(document.getElementById("map"), {
     zoom: 4,
     center: position,
-    mapId: "RackeTrack Position",
+    mapId: "Athlete Position",
   });
 
   // The marker, positioned at Uluru

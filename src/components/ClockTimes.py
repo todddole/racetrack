@@ -3,6 +3,7 @@ from threading import Thread
 import time
 import logging
 from src.components.constants import *
+import json
 
 TIME_MAT_CATEGORIES = ANALYZER_CATEGORIES
 
@@ -43,6 +44,24 @@ class ClockTimes:
             logging.debug(" init "+TIME_MAT_CATEGORIES[i] + " size "+str(len(self.timedata[i])))
             self.lastupdates[i] = time.time()
 
+        self.locdata = self.ldg.get_all_data(self.rname + "-locations")
+        self.locupdate = time.time()
+
+        self.racenumbers = self.ldg.get_data("racenumbers", self.rname)
+        athletes = self.ldg.get_all_data("athletes")
+        self.devices = {}
+        for key in self.racenumbers:
+
+            athid = int(self.racenumbers[key])
+
+            for athletecount in range(len(athletes)):
+                if (int((athletes[athletecount])["_id"]) == athid): break
+            athlete = athletes[athletecount]["data"]
+
+            athlete = json.loads(athlete)
+            self.devices[key] = athlete["deviceid"]
+
+
     def refresh_data(self, index):
         logging.debug("Refreshing Data")
         self.timedata[index] = massage(self.ldg.get_all_data(self.rname + "-" + TIME_MAT_CATEGORIES[index]))
@@ -51,6 +70,38 @@ class ClockTimes:
     def get_starters(self):
         self.refresh_data(0)
         return self.timedata[0]
+
+    def get_racenumbers(self):
+        return self.racenumbers
+
+    def get_device(self, athid):
+        if athid in self.devices.keys():
+            return self.devices[athid]
+        return None
+    def get_locations(self):
+        if (time.time() - self.locupdate > 60):
+            self.locdata = self.ldg.get_all_data(self.rname + "-locations")
+            self.locupdate = time.time()
+        return self.locdata
+
+    def get_location_and_time(self, athid):
+        if (athid is None) or (athid == ""): return None, None
+        if (time.time() - self.locupdate > 60):
+            self.locdata = self.ldg.get_all_data(self.rname + "-locations")
+            self.locupdate = time.time()
+        devid = self.get_device(athid)
+        bestloctime = 0.0
+        bestlocation = None
+        for location in self.locdata:
+            if (devid + "-") not in location["_id"]: continue
+            thisdata = location["data"]
+            thistime = float(thisdata["time"])
+            if thistime > bestloctime:
+                bestloctime = thistime
+                bestlocation = (float(thisdata["la"]), float(thisdata["lo"]))
+        return bestlocation, bestloctime
+
+
 
     def get_phasers(self, phase):
         if phase not in TIME_MAT_CATEGORIES: return None
