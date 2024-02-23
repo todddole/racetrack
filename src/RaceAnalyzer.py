@@ -135,6 +135,8 @@ class Race:
         self.rname = "race"+self.rname
         print("rname is " + self.rname)
         self.clocktimes = ClockTimes(self.rname)
+        while (race.clocktimes.ready == False):
+            time.sleep(1)
 
         self.swimcrs = SWIMCRS
 
@@ -300,6 +302,7 @@ if __name__ == '__main__':
 
     race = Race()
     race.make_leaderboards()
+
     lastupdate = time.time()
     #print(race.clocktimes.get_location_and_time('23'))
 

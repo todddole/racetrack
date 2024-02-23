@@ -77,8 +77,7 @@ def get_header():
         return ldg, raceinfo, rname
 
 app = Flask(__name__)
-ldg, raceinfo, rname = get_header()
-clocktimes = ClockTimes(rname)
+clocktimes = None
 
 def send_rabbit_mq(message):
 
@@ -165,6 +164,9 @@ def main():
       
     '''
     returnstr += raceinfo
+    if (clocktimes.ready==False):
+        returnstr+="<br><h1>Data is loading.</h1><h3>Please refresh in 60 seconds.</h3>"
+        return returnstr
 
     returnstr += '''
     <h3>Search by athlete name, race number, or race division:</h3>
@@ -339,6 +341,9 @@ def detail():
     athid = request.args.get('id')
 
     ldg, raceinfo, rname = get_header()
+    if (clocktimes.ready==False):
+        returnstr="<br><h1>Data is loading.</h1><h3>Please refresh in 60 seconds.</h3>"
+        return returnstr
     location, loctime = clocktimes.get_location_and_time(athid)
 
 
@@ -373,6 +378,10 @@ def status():
     ldg, raceinfo, rname = get_header()
     if clocktimes is None: clocktimes = ClockTimes(rname)
     if (rname!=clocktimes.rname) : clocktimes = ClockTimes(rname)
+
+    if (clocktimes.ready==False):
+        returnstr="<br><h1>Data is loading.</h1><h3>Please refresh in 60 seconds.</h3>"
+        return returnstr
 
     name = request.form.get('name')
     division = request.form.get('agegroup')

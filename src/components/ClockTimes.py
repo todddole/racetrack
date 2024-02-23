@@ -17,17 +17,42 @@ def massage(mylist):
 
 class ClockTimesRefresher(Thread):
     def setup(self, ct):
-        self.clocktime = ct
+        self.clocktimes = ct
 
     def run(self):
-        pass
+        for i in range(len(TIME_MAT_CATEGORIES)):
+            call_name = self.clocktimes.rname + "-" + TIME_MAT_CATEGORIES[i]
+            data = self.clocktimes.ldg.get_all_data(call_name)
+            self.clocktimes.timedata[i] = massage(data)
+            logging.debug(" init " + TIME_MAT_CATEGORIES[i] + " size " + str(len(self.clocktimes.timedata[i])))
+            self.clocktimes.lastupdates[i] = time.time()
+        self.clocktimes.locdata = self.clocktimes.ldg.get_all_data(self.clocktimes.rname + "-locationlasts")
+        self.clocktimes.locupdate = time.time()
+
+        self.clocktimes.racenumbers = self.clocktimes.ldg.get_data("racenumbers", self.clocktimes.rname)
+        athletes = self.clocktimes.ldg.get_all_data("athletes")
+        self.clocktimes.athletes=athletes
+        if self.clocktimes.athletes[len(self.clocktimes.athletes)-1]["_id"] == "athlete_list":
+            del self.clocktimes.athletes[len(self.clocktimes.athletes)-1]
+
+        self.clocktimes.devices = {}
+        for key in self.clocktimes.racenumbers:
+
+            athid = int(self.clocktimes.racenumbers[key])
+
+            for athletecount in range(len(athletes)):
+                if (int((athletes[athletecount])["_id"]) == athid): break
+            athlete = athletes[athletecount]["data"]
+
+            athlete = json.loads(athlete)
+            self.clocktimes.devices[key] = athlete["deviceid"]
+        self.clocktimes.ready=True
 
 class ClockTimes:
     def __init__(self, rname):
         self.ldg = LocationDataGateway()
-        #self.refresher = ClockTimesRefresher()
-        #self.refresher.setup(self)
-        #self.refresher.start()
+        self.refresher = ClockTimesRefresher()
+        self.refresher.setup(self)
         self.starttime = time.time()
         self.rname = rname
 
@@ -37,33 +62,10 @@ class ClockTimes:
             self.timedata.append({})
             self.lastupdates.append(0)
 
-        for i in range(len(TIME_MAT_CATEGORIES)):
-            call_name = self.rname + "-" + TIME_MAT_CATEGORIES[i]
-            data = self.ldg.get_all_data(call_name)
-            self.timedata[i]=massage(data)
-            logging.debug(" init "+TIME_MAT_CATEGORIES[i] + " size "+str(len(self.timedata[i])))
-            self.lastupdates[i] = time.time()
+        self.ready=False
+        self.refresher.start()
 
-        self.locdata = self.ldg.get_all_data(self.rname + "-locationlasts")
-        self.locupdate = time.time()
 
-        self.racenumbers = self.ldg.get_data("racenumbers", self.rname)
-        athletes = self.ldg.get_all_data("athletes")
-        self.athletes=athletes
-        if self.athletes[len(self.athletes)-1]["_id"] == "athlete_list":
-            del self.athletes[len(self.athletes)-1]
-
-        self.devices = {}
-        for key in self.racenumbers:
-
-            athid = int(self.racenumbers[key])
-
-            for athletecount in range(len(athletes)):
-                if (int((athletes[athletecount])["_id"]) == athid): break
-            athlete = athletes[athletecount]["data"]
-
-            athlete = json.loads(athlete)
-            self.devices[key] = athlete["deviceid"]
 
 
     def refresh_data(self, index):
