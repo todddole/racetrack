@@ -47,27 +47,6 @@ import pika
 import os
 from dotenv import load_dotenv
 
-
-app = Flask(__name__)
-clocktimes = None
-
-def send_rabbit_mq(message):
-
-    rmqurl = os.getenv("RABBITMQ_URL", "")
-    rmqque = os.getenv("RABBITMQ_QUEUE", "")
-
-    try:
-        params=pika.URLParameters(rmqurl)
-        connection = pika.BlockingConnection(params)
-        channel = connection.channel()
-        channel.queue_declare(queue=rmqque)
-        channel.basic_publish(exchange='',
-                              routing_key=rmqque,
-                              body=message)
-        connection.close()
-    except Exception as e:
-        pass
-
 def get_header():
     # does a few common page functions:
     # gets and returns ldg
@@ -96,6 +75,29 @@ def get_header():
         clocktime = str(datetime.timedelta(seconds=curtime - starttime))
         raceinfo += "<h2>Race Clock Time: " + clocktime + "</h2>\n"
         return ldg, raceinfo, rname
+
+app = Flask(__name__)
+ldg, raceinfo, rname = get_header()
+clocktimes = ClockTimes(rname)
+
+def send_rabbit_mq(message):
+
+    rmqurl = os.getenv("RABBITMQ_URL", "")
+    rmqque = os.getenv("RABBITMQ_QUEUE", "")
+
+    try:
+        params=pika.URLParameters(rmqurl)
+        connection = pika.BlockingConnection(params)
+        channel = connection.channel()
+        channel.queue_declare(queue=rmqque)
+        channel.basic_publish(exchange='',
+                              routing_key=rmqque,
+                              body=message)
+        connection.close()
+    except Exception as e:
+        pass
+
+
 
 def get_division(division, birthdate, gender):
     # returns the triathlon division for an athlete
