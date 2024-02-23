@@ -135,7 +135,7 @@ class Race:
         self.rname = "race"+self.rname
         print("rname is " + self.rname)
         self.clocktimes = ClockTimes(self.rname)
-        while (race.clocktimes.ready == False):
+        while (self.clocktimes.ready == False):
             time.sleep(1)
 
         self.swimcrs = SWIMCRS
