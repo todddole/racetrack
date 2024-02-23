@@ -5,7 +5,8 @@ import logging
 from src.components.constants import *
 import json
 
-TIME_MAT_CATEGORIES = ANALYZER_CATEGORIES
+TIME_MAT_CATEGORIES = ANALYZER_CATEGORIES[:]
+TIME_MAT_CATEGORIES.append("DNF")
 
 TIME_THRESHOLD = 120
 def massage(mylist):
@@ -20,7 +21,6 @@ class ClockTimesRefresher(Thread):
 
     def run(self):
         pass
-
 
 class ClockTimes:
     def __init__(self, rname):
@@ -44,11 +44,15 @@ class ClockTimes:
             logging.debug(" init "+TIME_MAT_CATEGORIES[i] + " size "+str(len(self.timedata[i])))
             self.lastupdates[i] = time.time()
 
-        self.locdata = self.ldg.get_all_data(self.rname + "-locations")
+        self.locdata = self.ldg.get_all_data(self.rname + "-locationlasts")
         self.locupdate = time.time()
 
         self.racenumbers = self.ldg.get_data("racenumbers", self.rname)
         athletes = self.ldg.get_all_data("athletes")
+        self.athletes=athletes
+        if self.athletes[len(self.athletes)-1]["_id"] == "athlete_list":
+            del self.athletes[len(self.athletes)-1]
+
         self.devices = {}
         for key in self.racenumbers:
 
@@ -80,25 +84,24 @@ class ClockTimes:
         return None
     def get_locations(self):
         if (time.time() - self.locupdate > 60):
-            self.locdata = self.ldg.get_all_data(self.rname + "-locations")
+            self.locdata = self.ldg.get_all_data(self.rname + "-locationlasts")
             self.locupdate = time.time()
         return self.locdata
 
     def get_location_and_time(self, athid):
         if (athid is None) or (athid == ""): return None, None
         if (time.time() - self.locupdate > 60):
-            self.locdata = self.ldg.get_all_data(self.rname + "-locations")
+            self.locdata = self.ldg.get_all_data(self.rname + "-locationlasts")
             self.locupdate = time.time()
         devid = self.get_device(athid)
-        bestloctime = 0.0
-        bestlocation = None
+
+        bestlocation=None
+        bestloctime=None
         for location in self.locdata:
-            if (devid + "-") not in location["_id"]: continue
+            if (devid) != location["_id"]: continue
             thisdata = location["data"]
-            thistime = float(thisdata["time"])
-            if thistime > bestloctime:
-                bestloctime = thistime
-                bestlocation = (float(thisdata["la"]), float(thisdata["lo"]))
+            bestloctime = float(thisdata["time"])
+            bestlocation = (float(thisdata["la"]), float(thisdata["lo"]))
         return bestlocation, bestloctime
 
 

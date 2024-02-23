@@ -141,8 +141,9 @@ class Race:
         self.bikecrs = BIKECRS
 
         self.runcrs = RUNCRS
-        self.racenumbers = self.ldg.get_data("racenumbers", self.rname)
-        self.athletes = massage(self.ldg.get_all_data("athletes"))
+        self.racenumbers = self.clocktimes.racenumbers
+        self.athletes =  massage(self.clocktimes.athletes)
+
         for athlete in self.athletes:
             self.athletes[athlete] = json.loads(self.athletes[athlete])
             self.athletes[athlete]["division"] = get_div(
@@ -298,6 +299,10 @@ if __name__ == '__main__':
     load_dotenv()
 
     race = Race()
+    race.make_leaderboards()
+    lastupdate = time.time()
+    #print(race.clocktimes.get_location_and_time('23'))
+
     if (RABBITMQ == True):
         rmqurl = os.getenv("RABBITMQ_URL", "")
         rmqque = os.getenv("RABBITMQ_QUEUE", "")

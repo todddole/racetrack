@@ -109,6 +109,7 @@ class ApiReporter(Thread):
         self.pq = Queue()
         self.finished = False
         self.api_url = api_url
+        self.api_alturl = api_url.replace("/data/","/location/")
         self.api_key = api_key
 
     def add(self, item, priority=False):
@@ -133,7 +134,10 @@ class ApiReporter(Thread):
             key = item["key"]
             data = item["data"]
             try:
-                url = self.api_url+key+"/"
+                if ("location" in str(data)) or ("multi" in key):
+                    url = self.api_alturl + key + "/"
+                else:
+                    url = self.api_url+key+"/"
 
                 response = requests.post(url, data=json.dumps(data),
                                          headers={"Content-Type":"application/json"})
@@ -536,7 +540,7 @@ class RaceAthlete(Athlete):
         sizefactor=2
         if (race.qsize) > 50 and (race.qsize)< 200: sizefactor=5
         elif (race.qsize) < 500: sizefactor=10
-        elif (race.qsize) < 10000: sizefactor = 20
+        elif (race.qsize) < 1500: sizefactor = 20
         else: sizefactor=60
         if (len(self.locdatarecord)>=sizefactor) and (random.randint(1,2)==2):
             race.report_data("multipart", self.locdatarecord, priority=False, extraname="-locations")
@@ -898,6 +902,7 @@ def load_athletes(athletecount, promcount, profcount):
     prom_aths = []
     prof_aths = []
     for i in athletelist:
+        if i["_id"] == "athlete_list": continue
         j=json.loads(i["data"])
         if (j["division"] == 'MPRO'):
             prom_aths.append(i)

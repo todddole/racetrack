@@ -28,6 +28,11 @@
 #   RaceAnalyzer checks if it's been more than 2 minutes since leaderboards were refreshed,
 #   and refreshes them if so
 #   (note that for now, this probably won't reflect on the current get)
+#
+# V1.5 Maps Implementation
+#   Added Google Map to Details Page
+#   Added Google Map to / with all the athletes in the currently selected leaderboard division
+#
 
 
 from flask import Flask, request, url_for, render_template
@@ -147,21 +152,14 @@ def main():
     if clocktimes is None: clocktimes = ClockTimes(rname)
     if (rname!=clocktimes.rname) : clocktimes = ClockTimes(rname)
 
-
-    returnstr = '''
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-    <title>Racetrack</title>
-    </head>
-    <body>
+    returnstr = render_template('map.html')
+    returnstr += '''
+    
     
     <h1>Racetrack Race Tracking Software</h1>
     <p>About: This software currently allows real time location tracking of simulated athletes in a simulated triathlon on a certain big island in Hawaii.</p>
     <p>Any resemblence to real people or races is purely coincidental.</p>
     <p>A description of the project maybe found at <a href="https://github.com/todddole/racetrack">https://github.com/todddole/racetrack</a></p>
-    <p>This is a pre-alpha version of the software, sorry if it takes a while for pages to load.  Speed optimizations coming soon...</p>
-    
       
     '''
     returnstr += raceinfo
@@ -212,6 +210,7 @@ def main():
     <h1>Race Leaderboard: 
     '''
 
+    leaderboardorig = leaderboard
     if leaderboard=="M80": leaderboard="M80+"
     elif leaderboard=="F80": leaderboard="F80+"
     if (leaderboard not in ANALYZE_DIVISIONS):
@@ -221,16 +220,16 @@ def main():
     returnstr += leaderboard
     lbdata = ldg.get_data(leaderboard, rname+"-Leaderboards")
     if (lbdata is None):
-        returnstr += "No Data Yet</h1>"
-        return returnstr
-    lblocation = lbdata["location"]
+        returnstr += " -- No Data Yet</h1>"
+    else:
+        lblocation = lbdata["location"]
 
-    pacetype = PACE_NONE
-    if lblocation in TIMING_MATS.keys():
-        pacetype = TIMING_MATS[lblocation][2]
-        lblocation = TIMING_MATS[lblocation][0]
+        pacetype = PACE_NONE
+        if lblocation in TIMING_MATS.keys():
+            pacetype = TIMING_MATS[lblocation][2]
+            lblocation = TIMING_MATS[lblocation][0]
 
-    returnstr += " at " + lblocation + "</h1>\n"
+        returnstr += " at " + lblocation + "</h1>\n"
 
     returnstr += '''
     <form id="lbform" action="/" method="get"><br>
@@ -267,24 +266,68 @@ def main():
     </select>
     <input type=submit value="submit">
     </form><br>
-    
-    
+        
     '''
 
-    returnstr += "<table><TR><TH>Race Number</TH><TH>Name</TH><TH>Time Behind Leader</TH>"
-    if (pacetype!=PACE_NONE): returnstr += "<TH>Speed:</TH>"
-    returnstr += "</TR>\n"
-    for i in range(1,21):
-        key = str(i)
-        if key in lbdata.keys():
-            returnstr += "<tr><td>" + str(lbdata[key]["number"]) + "</td><td>" + \
-                str(lbdata[key]["name"]) + "</td><td>" + str(lbdata[key]["time"]) + "</td>"
-            if (pacetype != PACE_NONE): returnstr += "<td>" + str(lbdata[key]["pace"]) +"</td>"
-            returnstr+="</tr>\n"
+    returnstr = returnstr.replace("value=\""+leaderboardorig+"\">", "value=\""+leaderboardorig+"\" selected>")
+
+    if (lbdata is not None):
+        returnstr += "<table><TR><TH>Race Number</TH><TH>Name</TH><TH>Time Behind Leader</TH>"
+        if (pacetype!=PACE_NONE): returnstr += "<TH>Speed:</TH>"
+        returnstr += "</TR>\n"
+        for i in range(1,21):
+            key = str(i)
+            if key in lbdata.keys():
+                returnstr += "<tr><td>" + str(lbdata[key]["number"]) + "</td><td>" + \
+                    str(lbdata[key]["name"]) + "</td><td>" + str(lbdata[key]["time"]) + "</td>"
+                if (pacetype != PACE_NONE): returnstr += "<td>" + str(lbdata[key]["pace"]) +"</td>"
+                returnstr+="</tr>\n"
 
 
-    returnstr += "</table>"
+        returnstr += "</table>"
 
+    # Add the Map
+
+    racenumbers = clocktimes.racenumbers
+
+    athletes = clocktimes.athletes
+
+    maplocs = []
+    dnfers = clocktimes.get_phasers("DNF")
+
+    for key in racenumbers:
+        if key in dnfers.keys(): continue
+        athid = int(racenumbers[key])
+
+        for athletecount in range(len(athletes)):
+            if (int((athletes[athletecount])["_id"]) == athid): break
+        athlete = athletes[athletecount]["data"]
+
+        athlete = json.loads(athlete)
+
+        mydivision = get_division(athlete["division"] , athlete["birthdate"], athlete["gender"])
+        if (mydivision != leaderboard): continue
+
+        ####
+        location, loctime = clocktimes.get_location_and_time(key)
+        if (location is not None):
+            maplocs.append((location, athlete["name"]))
+
+    locs = [maplocs[i][0] for i in range (len(maplocs))]
+
+    input_lat = sum([locs[i][0] for i in range(len(locs))] ) / len (locs)
+    input_long = sum([locs[i][1] for i in range(len(locs))]) / len (locs)
+
+    returnstr += "<h3>Location Map for "+leaderboard+"</h3><br>"
+    returnstr += "<div id=\"map\"></div>"
+    returnstr += "<script>initMap( " + str(input_lat) + ", " + str(input_long) + " );\n"
+
+    for maploc in maplocs:
+        input_lat = maploc[0][0]
+        input_long = maploc[0][1]
+        input_name = maploc[1]
+        returnstr += "addMarker("+ str(input_lat) + ", " + str(input_long) + ", \""+str(input_name)+"\");\n"
+    returnstr += "</script>"
 
     return returnstr
 @app.route('/detail', methods=['GET'])
@@ -297,8 +340,13 @@ def detail():
     location, loctime = clocktimes.get_location_and_time(athid)
 
 
+    returnstr = render_template('map.html')
+    for athletecount in range(len(clocktimes.athletes)):
+        if (int((clocktimes.athletes[athletecount])["_id"]) == athid): break
+    athlete = clocktimes.athletes[athletecount]["data"]
+    athlete = json.loads(athlete)
 
-    returnstr = "<H1>Details for " + athid + "</H1>:"
+    returnstr += "<H1>Details for " + athlete["name"] + "</H1>:"
     returnstr += "Last Known Location:<br>\n"
     secondsago = int(time.time() - float(loctime))
     returnstr += str(location) + ", reported " + str(secondsago) + " seconds ago<br>\n"
@@ -306,9 +354,12 @@ def detail():
     input_lat = location[0]
     input_long = location[1]
 
-    returnstr += render_template('map.html')
-    returnstr += "<script>initMap( " + str(input_lat) + ", " + str(input_long) + " );</script>"
 
+    returnstr += "<h3>Current Location:</h3><br>"
+    returnstr += "<div id=\"map\"></div>"
+
+    returnstr += "<script>initMap( " + str(input_lat) + ", " + str(input_long) + " );\n"
+    returnstr += "addMarker(" + str(input_lat) + ", " + str(input_long) + ", 'Location');\n</script>"
     return returnstr
 
 
@@ -341,11 +392,9 @@ def status():
     returnstr = raceinfo
 
 
-    racenumbers = ldg.get_all_data(rname)
-    racenumbers = racenumbers[0]["data"]
+    racenumbers = clocktimes.racenumbers
 
-    athletes = ldg.get_all_data("athletes")
-
+    athletes = clocktimes.athletes
 
     returnstr += '''<Table border=1 padding=10px><tr><th>Race Number</th><th>Name</th><th>division</th><th>Status</th>
             <th>Start Time</th><th>Swim</th><th>T1</th><th>Bike</th><th>T2</th><th>Run</th><th>Finish</th>
@@ -359,8 +408,6 @@ def status():
         for athletecount in range(len(athletes)):
             if (int((athletes[athletecount])["_id"]) == athid): break
         athlete = athletes[athletecount]["data"]
-
-
         athlete = json.loads(athlete)
 
         if (type == 'racename') and name not in athlete["name"]: continue

@@ -8,18 +8,23 @@ async function initMap(input_lat, input_long) {
   //@ts-ignore
   const { Map } = await google.maps.importLibrary("maps");
   const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-
-  // The map, centered at Uluru
-  map = new Map(document.getElementById("map"), {
-    zoom: 4,
+    map = new Map(document.getElementById("map"), {
+    zoom: 10,
     center: position,
     mapId: "Athlete Position",
   });
 
-  // The marker, positioned at Uluru
+}
+
+async function addMarker(input_lat, input_long, marker_label) {
+  const position = {lat: input_lat, lng: input_long};
+
+  const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
   const marker = new AdvancedMarkerElement({
     map: map,
     position: position,
-    title: "User Location",
+    title: marker_label,
+
   });
 }
